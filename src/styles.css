@@ -314,7 +314,8 @@ img { display: block; }
 .primary-button:hover { background: #017636; }
 
 /* ---------- Benefit cards ---------- */
-.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(293px, 1fr)); gap: 24px; }
+/* Column count comes from BalancedGrid (--cols), which evens out the rows */
+.card-grid { display: grid; grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)); gap: 24px; }
 
 .benefit-card {
   display: flex;
@@ -343,7 +344,7 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
 .benefit-card.is-closed .text-link { color: var(--green-disabled); }
 
 /* ---------- Order cards ---------- */
-.order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 302px)); gap: 24px; }
+.order-grid { display: grid; grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)); gap: 24px; }
 
 .order-card {
   display: flex;
