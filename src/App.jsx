@@ -63,7 +63,7 @@ export default function App() {
               {orders.length === 1 ? (
                 <WideOrderCard order={orders[0]} hideSensitive={hideSensitive} />
               ) : (
-                <div className="order-grid">
+                <div className={`order-grid${orders.length === 2 ? ' order-grid-2' : ''}`}>
                   {orders.map((o) => <OrderCard key={o.ref} order={o} hideSensitive={hideSensitive} />)}
                 </div>
               )}
