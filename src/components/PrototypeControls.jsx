@@ -1,0 +1,38 @@
+import { useState } from 'react';
+import { STATES } from '../data.js';
+
+// Floating panel for switching between the page states drawn in Figma.
+// Not part of the design; the selected state is kept in the URL (?state=…).
+export default function PrototypeControls({ current, onSelect }) {
+  const [open, setOpen] = useState(false);
+  const groups = [...new Set(STATES.map((s) => s.group))];
+  const active = STATES.find((s) => s.id === current);
+
+  return (
+    <div className={`proto-controls${open ? ' is-open' : ''}`}>
+      {open && (
+        <div className="proto-panel" role="dialog" aria-label="Prototype states">
+          {groups.map((g) => (
+            <div key={g} className="proto-group">
+              <p className="proto-group-title">{g}</p>
+              {STATES.filter((s) => s.group === g).map((s) => (
+                <button
+                  type="button"
+                  key={s.id}
+                  className={`proto-option${s.id === current ? ' is-active' : ''}`}
+                  onClick={() => { onSelect(s.id); setOpen(false); }}
+                >
+                  {s.name}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+      <button type="button" className="proto-pill" aria-expanded={open} onClick={() => setOpen(!open)}>
+        <span className="proto-dot" />
+        Prototype state: <strong>{active?.name}</strong>
+      </button>
+    </div>
+  );
+}
