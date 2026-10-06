@@ -343,8 +343,7 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
 .benefit-card.is-closed .text-link { color: var(--green-disabled); }
 
 /* ---------- Order cards ---------- */
-.order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(293px, 1fr)); gap: 24px; }
-.order-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.order-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
 
 .order-card {
   display: flex;
