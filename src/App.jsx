@@ -4,6 +4,7 @@ import Header from './components/Header.jsx';
 import { BenefitCard, OrderCard, WideOrderCard, Kpi } from './components/Cards.jsx';
 import { Breadcrumbs, SensitiveToggle, BasketBanner, Faq, Footer } from './components/Sections.jsx';
 import PrototypeControls from './components/PrototypeControls.jsx';
+import BalancedGrid from './components/BalancedGrid.jsx';
 
 const DEFAULT_STATE = 'four';
 
@@ -63,9 +64,9 @@ export default function App() {
               {orders.length === 1 ? (
                 <WideOrderCard order={orders[0]} hideSensitive={hideSensitive} />
               ) : (
-                <div className="order-grid">
+                <BalancedGrid className="order-grid" count={orders.length}>
                   {orders.map((o) => <OrderCard key={o.ref} order={o} hideSensitive={hideSensitive} />)}
-                </div>
+                </BalancedGrid>
               )}
             </section>
           )}
@@ -74,9 +75,9 @@ export default function App() {
             <h2 className="section-title">
               {hasOrders ? 'Add more benefits' : 'Available to you now'} ({page.available.length})
             </h2>
-            <div className="card-grid">
+            <BalancedGrid className="card-grid" count={page.available.length}>
               {page.available.map((c) => <BenefitCard key={c.key} id={c.key} tag={c.tag} />)}
-            </div>
+            </BalancedGrid>
           </section>
 
           {page.election && (
@@ -87,9 +88,9 @@ export default function App() {
                   Some benefits are only available to apply for during set periods called Election Windows. The next one opens 30/9/2026.
                 </p>
               </div>
-              <div className="card-grid">
+              <BalancedGrid className="card-grid" count={page.election.length}>
                 {page.election.map((c) => <BenefitCard key={c.key} id={c.key} closed />)}
-              </div>
+              </BalancedGrid>
             </section>
           )}
 
