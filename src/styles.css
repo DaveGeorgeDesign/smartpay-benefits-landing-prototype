@@ -54,7 +54,7 @@ img { display: block; }
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding: 24px var(--header-pad);
+  padding: 24px 16px;
   background: #fff;
   border-bottom: 2px solid var(--green);
 }
@@ -128,7 +128,7 @@ img { display: block; }
   background: #fff;
 }
 
-.nav-home { padding: 14px 16px; flex-shrink: 0; }
+.nav-home { padding: 14px 16px 14px 0; flex-shrink: 0; }
 
 .nav-item {
   flex-shrink: 0;
