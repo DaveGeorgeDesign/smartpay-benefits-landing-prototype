@@ -101,7 +101,7 @@ function ActiveBenefit({ order, hidden }) {
   const detailsId = `cur-${order.ref}`;
   return (
     <article className="cur-panel cur-active">
-      <span className="cur-chip cur-chip-green"><CheckCircleIcon size={12} />Active</span>
+      <span className="cur-chip cur-chip-green"><CheckCircleIcon size={12} color="currentColor" />Active</span>
       <h3 className="cur-active-title">{order.title}</h3>
       <dl className="cur-active-fields">
         {order.fields.map(([k, v]) => (
@@ -172,7 +172,7 @@ function BasketPanel({ items }) {
 function Status({ Icon, tone, children }) {
   return (
     <span className={`cur-status cur-status-${tone}`}>
-      <Icon size={14} />
+      <Icon size={14} color="currentColor" />
       {children}
     </span>
   );
@@ -184,17 +184,23 @@ function BenefitCard({ id, cfg, inBasket, showPot }) {
   const notOpen = windowBenefit && cfg.window === 'closed';
   return (
     <article className="cur-card">
-      <img className="cur-card-image" src={b.image} alt="" loading="lazy" />
+      <div className="cur-card-media">
+        <img src={b.image} alt="" loading="lazy" />
+        {(inBasket || b.tag === 'new') && (
+          <div className="cur-card-badges">
+            {inBasket && <span className="tag tag-red"><CheckCircleIcon color="currentColor" />In basket</span>}
+            {b.tag === 'new' && <span className="tag tag-blue"><StarOutlineSmallIcon color="currentColor" />New Benefit</span>}
+          </div>
+        )}
+      </div>
       <div className="cur-card-content">
         <h3 className="cur-card-title">{b.title}</h3>
         <div className="cur-card-status">
-          {inBasket && <Status Icon={CheckCircleIcon} tone="red">In basket</Status>}
           {!windowBenefit && <Status Icon={CheckCircleIcon} tone="green">Always Open</Status>}
           {windowBenefit && cfg.window === 'open' && <Status Icon={CheckCircleIcon} tone="green">Open until {WINDOW_DATE}</Status>}
           {windowBenefit && cfg.window === 'closing' && <Status Icon={RenewIcon} tone="amber">Closes in 3 days</Status>}
           {notOpen && <Status Icon={BlockedIcon} tone="red">Not Open</Status>}
           {showPot && !notOpen && !NOT_POT_ELIGIBLE.includes(id) && <Status Icon={CheckCircleIcon} tone="green">Benefit Pot</Status>}
-          {b.tag === 'new' && <Status Icon={StarOutlineSmallIcon} tone="blue">New Benefit</Status>}
         </div>
         {notOpen && <p className="cur-card-note">The next window for this benefit opens on {WINDOW_DATE}.</p>}
         <div className="cur-actions">
