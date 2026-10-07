@@ -43,7 +43,7 @@ export default function App() {
           <Breadcrumbs />
 
           <div className="page-title">
-            <h1>Welcome to your benefits</h1>
+            <h1>Welcome to your benefits, Dave</h1>
             <div className="page-title-row">
               <p className="intro">{page.intro}</p>
               <SensitiveToggle on={hideSensitive} onChange={setHideSensitive} />
