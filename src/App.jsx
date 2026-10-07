@@ -5,6 +5,7 @@ import { BenefitCard, OrderCard, WideOrderCard, Kpi } from './components/Cards.j
 import { Breadcrumbs, SensitiveToggle, BasketBanner, Faq, Footer } from './components/Sections.jsx';
 import PrototypeControls from './components/PrototypeControls.jsx';
 import BalancedGrid from './components/BalancedGrid.jsx';
+import CurrentHomepage from './components/CurrentHomepage.jsx';
 
 const DEFAULT_STATE = 'four';
 
@@ -13,13 +14,22 @@ function readState() {
   return STATES.some((s) => s.id === id) ? id : DEFAULT_STATE;
 }
 
+// ?view=current shows the existing homepage in the same state, for comparison
+function readView() {
+  return new URLSearchParams(window.location.search).get('view') === 'current' ? 'current' : 'new';
+}
+
 export default function App() {
   const [stateId, setStateId] = useState(readState);
+  const [view, setView] = useState(readView);
   const [hideSensitive, setHideSensitive] = useState(false);
   const page = STATES.find((s) => s.id === stateId);
 
   useEffect(() => {
-    const onPop = () => setStateId(readState());
+    const onPop = () => {
+      setStateId(readState());
+      setView(readView());
+    };
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
   }, []);
@@ -31,6 +41,27 @@ export default function App() {
     setStateId(id);
     window.scrollTo({ top: 0 });
   };
+
+  const selectView = (v) => {
+    const url = new URL(window.location.href);
+    if (v === 'current') url.searchParams.set('view', v);
+    else url.searchParams.delete('view');
+    window.history.pushState({}, '', url);
+    setView(v);
+  };
+
+  const controls = <PrototypeControls current={stateId} onSelect={selectState} view={view} onView={selectView} />;
+
+  if (view === 'current') {
+    return (
+      <>
+        <Header />
+        <CurrentHomepage key={stateId} page={page} />
+        <Footer />
+        {controls}
+      </>
+    );
+  }
 
   const orders = (page.orders || []).map((k) => ORDERS[k]);
   const hasOrders = orders.length > 0;
@@ -101,7 +132,7 @@ export default function App() {
       </main>
       <Faq />
       <Footer />
-      <PrototypeControls current={stateId} onSelect={selectState} />
+      {controls}
     </>
   );
 }
