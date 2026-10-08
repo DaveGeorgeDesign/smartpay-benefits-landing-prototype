@@ -237,8 +237,12 @@ export default function CurrentHomepage({ page, showPot = true }) {
   const pot = showPot ? cfg.pot : null;
   const orders = (page.orders || []).map((k) => ORDERS[k]);
   const basket = cfg.basket || [];
-  // Same benefits as the new design's state; window-only benefits sit at the end when closed
-  const benefits = [...page.available, ...(page.election || [])].map((c) => c.key);
+  // Same benefits as the new design's state, always in catalogue order: unlike the new design,
+  // the current site doesn't move closed window-only benefits to the end
+  const order = Object.keys(BENEFITS);
+  const benefits = [...page.available, ...(page.election || [])]
+    .map((c) => c.key)
+    .sort((a, b) => order.indexOf(a) - order.indexOf(b));
 
   return (
     <div className="current">
