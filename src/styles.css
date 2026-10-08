@@ -767,8 +767,6 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
 /* Segmented switches in the prototype settings panel */
 .proto-setting { white-space: nowrap; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 4px 2px 0; }
 .proto-setting + .proto-setting { margin-top: 4px; }
-.proto-setting.is-disabled { opacity: 0.4; }
-.proto-setting.is-disabled button { cursor: not-allowed; }
 .proto-seg { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--bg-dark); }
 .proto-seg button { white-space: nowrap; padding: 5px 12px; border-radius: 999px; font-size: 13px; line-height: 16px; color: var(--text-secondary); }
 .proto-seg button.is-active { background: #1a1a1a; color: #fff; font-weight: 600; }

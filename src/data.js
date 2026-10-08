@@ -204,14 +204,16 @@ const POT_MODULE_KPIS = [
   { key: 'pot', label: '💰 Benefit Pot', value: '£1,000', note: 'of £1,200 left to spend', progress: 83 },
   { key: 'tech', label: '💻 Household & Tech', value: '£1,000', note: 'of £2,000 loan available', progress: 50 },
 ];
-// Window benefits a new basket is filled from, skipping any already held
+// Benefits a basket is filled from, skipping any already held; while the window is closed only always-open ones qualify
 const BASKET_CANDIDATES = ['pmi', 'pension', 'ev', 'healthCash'];
 
 export function buildPage({ window, basket, held }) {
   const orders = HELD_ORDERS[held];
   const notHeld = (k) => !orders.includes(k);
   const closed = window === 'closed';
-  const basketItems = basket && !closed ? BASKET_CANDIDATES.filter(notHeld).slice(0, 2) : [];
+  const basketItems = basket
+    ? BASKET_CANDIDATES.filter((k) => notHeld(k) && !(closed && BENEFITS[k].electionWindow)).slice(0, 2)
+    : [];
   return {
     window,
     held,

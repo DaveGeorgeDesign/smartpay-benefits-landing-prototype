@@ -18,7 +18,7 @@ function readSettings() {
   const win = WINDOWS.some(([id]) => id === q.get('window')) ? q.get('window') : base.window;
   const held = HELD.includes(Number(q.get('held'))) && q.has('held') ? Number(q.get('held')) : base.held;
   const basket = q.has('basket') ? q.get('basket') === 'yes' : base.basket;
-  return { window: win, basket: basket && win !== 'closed', held };
+  return { window: win, basket, held };
 }
 
 function writeSettings(url, { window: win, basket, held }) {
@@ -74,7 +74,6 @@ export default function App() {
 
   const changeSettings = (change) => {
     const next = { ...settings, ...change };
-    if (next.window === 'closed') next.basket = false;
     const url = new URL(window.location.href);
     writeSettings(url, next);
     window.history.pushState({}, '', url);

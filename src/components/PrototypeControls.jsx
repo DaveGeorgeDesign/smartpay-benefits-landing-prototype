@@ -10,13 +10,13 @@ function CogIcon() {
   );
 }
 
-function Segmented({ label, options, value, onChange, disabled }) {
+function Segmented({ label, options, value, onChange }) {
   return (
-    <div className={`proto-setting${disabled ? ' is-disabled' : ''}`}>
+    <div className="proto-setting">
       <span className="proto-group-title">{label}</span>
       <div className="proto-seg" role="group" aria-label={label}>
         {options.map(([v, text]) => (
-          <button type="button" key={text} disabled={disabled} className={value === v ? 'is-active' : ''} aria-pressed={value === v} onClick={() => onChange(v)}>
+          <button type="button" key={text} className={value === v ? 'is-active' : ''} aria-pressed={value === v} onClick={() => onChange(v)}>
             {text}
           </button>
         ))}
@@ -49,13 +49,7 @@ export default function PrototypeControls({ settings, onChange, view, onView, sh
         <div className="proto-panel" role="dialog" aria-label="Prototype settings">
           <Segmented label="Homepage version" options={[['current', 'Current'], ['new', 'New']]} value={view} onChange={onView} />
           <Segmented label="Election window" options={WINDOWS} value={settings.window} onChange={(w) => onChange({ window: w })} />
-          <Segmented
-            label="Basket"
-            options={[[true, 'Yes'], [false, 'No']]}
-            value={settings.basket}
-            onChange={(b) => onChange({ basket: b })}
-            disabled={settings.window === 'closed'}
-          />
+          <Segmented label="Basket" options={[[true, 'Yes'], [false, 'No']]} value={settings.basket} onChange={(b) => onChange({ basket: b })} />
           <Segmented label="Benefits held" options={HELD.map((n) => [n, String(n)])} value={settings.held} onChange={(n) => onChange({ held: n })} />
           <Segmented label="Benefit Pot" options={[[true, 'Show'], [false, 'Hide']]} value={showPot} onChange={onShowPot} />
         </div>
