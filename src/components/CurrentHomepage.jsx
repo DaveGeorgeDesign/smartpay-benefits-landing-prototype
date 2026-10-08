@@ -253,7 +253,9 @@ export default function CurrentHomepage({ page, showPot = true }) {
   const [privacy, setPrivacy] = useState(false);
   const cfg = CURRENT[page.id];
   const pot = showPot ? cfg.pot : null;
-  const orders = (page.orders || []).map((k) => ORDERS[k]);
+  // Without pots, drop the pot rows (and Card value, which would then just repeat Total cost)
+  const stripPot = (rows) => rows.filter(([k]) => showPot || !/Benefit Pot|Card value/.test(k));
+  const orders = (page.orders || []).map((k) => ({ ...ORDERS[k], fields: stripPot(ORDERS[k].fields), summary: stripPot(ORDERS[k].summary) }));
   const basket = cfg.basket || [];
   // Same benefits as the new design's state, always in catalogue order: unlike the new design,
   // the current site doesn't move closed window-only benefits to the end
