@@ -101,7 +101,11 @@ function ActiveBenefit({ order, hidden }) {
   const detailsId = `cur-${order.ref}`;
   return (
     <article className="cur-panel cur-active">
-      <span className="cur-chip cur-chip-green"><CheckCircleIcon size={12} color="currentColor" />Active</span>
+      {order.status === 'closed' ? (
+        <span className="cur-chip cur-chip-grey"><BlockedIcon size={12} color="currentColor" />Closed</span>
+      ) : (
+        <span className="cur-chip cur-chip-green"><CheckCircleIcon size={12} color="currentColor" />Active</span>
+      )}
       <h3 className="cur-active-title">{order.title}</h3>
       <dl className="cur-active-fields">
         {order.fields.map(([k, v]) => (

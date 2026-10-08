@@ -677,6 +677,7 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
 }
 
 .cur-chip-green { background: var(--green-20); color: var(--green-160); }
+.cur-chip-grey { background: var(--black-15); color: var(--text-primary); }
 
 .cur-active-fields { display: flex; flex-wrap: wrap; gap: 8px 40px; }
 .cur-active-fields dt,
