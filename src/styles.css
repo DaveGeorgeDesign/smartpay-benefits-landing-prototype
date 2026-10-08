@@ -453,21 +453,21 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
   font-family: var(--font-inter);
 }
 
-.proto-pill {
+.proto-fab {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border-radius: 999px;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   background: #1a1a1a;
   color: #fff;
-  font-size: 13px;
-  line-height: 16px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease;
 }
 
-.proto-pill strong { font-weight: 600; }
-.proto-dot { width: 8px; height: 8px; border-radius: 50%; background: #77dd77; }
+.proto-fab:hover { background: #333; }
+.proto-controls.is-open .proto-fab { transform: rotate(60deg); }
 
 .proto-panel {
   width: 300px;
@@ -777,9 +777,10 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
   .cur-faq { flex-direction: column; align-items: flex-start; }
 }
 
-/* Current / New switch in the prototype controls */
-.proto-view { display: inline-flex; padding: 3px; border-radius: 999px; background: #1a1a1a; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25); }
-.proto-view button { padding: 7px 14px; border-radius: 999px; color: #fff; font-size: 13px; line-height: 16px; }
-.proto-view button.is-active { background: #fff; color: #1a1a1a; font-weight: 600; }
-.proto-view-label { padding: 7px 6px 7px 12px; color: #bbb; font-size: 13px; line-height: 16px; }
-.proto-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+/* Segmented switches in the prototype settings panel */
+.proto-settings { padding-bottom: 4px; }
+.proto-setting { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-right: 4px; }
+.proto-setting + .proto-setting { margin-top: 2px; }
+.proto-seg { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--bg-dark); }
+.proto-seg button { padding: 5px 12px; border-radius: 999px; font-size: 13px; line-height: 16px; color: var(--text-secondary); }
+.proto-seg button.is-active { background: #1a1a1a; color: #fff; font-weight: 600; }

@@ -71,8 +71,10 @@ export default function App() {
     setShowPot(on);
   };
 
+  // Keyed so the settings panel stays open when switching between the two views
   const controls = (
     <PrototypeControls
+      key="prototype-controls"
       current={stateId}
       onSelect={selectState}
       view={view}
