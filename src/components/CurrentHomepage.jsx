@@ -257,9 +257,9 @@ export default function CurrentHomepage({ page, showPot = true }) {
   const stripPot = (rows) => rows.filter(([k]) => showPot || !/Benefit Pot|Card value/.test(k));
   const orders = (page.orders || []).map((k) => ({ ...ORDERS[k], fields: stripPot(ORDERS[k].fields), summary: stripPot(ORDERS[k].summary) }));
   const basket = cfg.basket || [];
-  // Same benefits as the new design's state, always in catalogue order: unlike the new design,
-  // the current site doesn't move closed window-only benefits to the end
-  const order = Object.keys(BENEFITS);
+  // Same benefits as the new design's state, Cycle to Work and Household & Tech first, then catalogue order;
+  // unlike the new design, the current site doesn't move closed window-only benefits to the end
+  const order = ['cycle', 'householdTech', ...Object.keys(BENEFITS).filter((k) => k !== 'cycle' && k !== 'householdTech')];
   const benefits = [...page.available, ...(page.election || [])]
     .map((c) => c.key)
     .sort((a, b) => order.indexOf(a) - order.indexOf(b));
