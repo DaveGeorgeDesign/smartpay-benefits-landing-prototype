@@ -3,7 +3,7 @@ import { BENEFITS, ORDERS } from '../data.js';
 import BalancedGrid from './BalancedGrid.jsx';
 import {
   CheckCircleIcon, BlockedIcon, RenewIcon, StarOutlineSmallIcon, EyeIcon, HomeIcon, ChevronForwardIcon,
-  DetailsChevronIcon, FileDownloadIcon, BasketIllustration,
+  DetailsChevronIcon, FileDownloadIcon, BasketIllustration, CartIcon,
 } from './Icons.jsx';
 
 // The existing benefits homepage, rebuilt from the Figma "Benefits Landing Page - Benefit Pots"
@@ -231,6 +231,24 @@ function FaqBanner() {
   );
 }
 
+// Benefits added to the basket during the window, before the order exists
+function BasketBenefit({ id, hidden }) {
+  return (
+    <article className="cur-panel cur-active">
+      <span className="cur-chip cur-chip-red"><CartIcon size={12} color="currentColor" />In basket</span>
+      <h3 className="cur-active-title">{BENEFITS[id].title}</h3>
+      <dl className="cur-active-fields">
+        <div><dt>You Pay</dt><dd><Money value="£XXXX" hidden={hidden} /></dd></div>
+        <div><dt>Employer Pays</dt><dd><Money value="£XXXX" hidden={hidden} /></dd></div>
+        <div><dt>Effective From</dt><dd>01/08/2026</dd></div>
+      </dl>
+      <div className="cur-actions">
+        <a href="#" className="cur-button cur-button-secondary">Benefit Page</a>
+      </div>
+    </article>
+  );
+}
+
 export default function CurrentHomepage({ page, showPot = true }) {
   const [privacy, setPrivacy] = useState(false);
   const cfg = CURRENT[page.id];
@@ -252,10 +270,11 @@ export default function CurrentHomepage({ page, showPot = true }) {
           <Breadcrumbs privacy={privacy} onPrivacy={setPrivacy} />
           {pot && <PotWidget pot={pot} hidden={privacy} />}
 
-          {orders.length > 0 && (
+          {(orders.length > 0 || basket.length > 0) && (
             <section className="cur-section">
               <h2 className="cur-section-title">Active Benefits</h2>
               <div className="cur-active-list">
+                {basket.map((k) => <BasketBenefit key={k} id={k} hidden={privacy} />)}
                 {orders.map((o) => <ActiveBenefit key={o.ref} order={o} hidden={privacy} />)}
               </div>
             </section>
