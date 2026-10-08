@@ -19,9 +19,15 @@ function readView() {
   return new URLSearchParams(window.location.search).get('view') === 'current' ? 'current' : 'new';
 }
 
+// ?pot=hide hides the Benefit Pot on the current homepage, which doesn't offer it yet
+function readShowPot() {
+  return new URLSearchParams(window.location.search).get('pot') !== 'hide';
+}
+
 export default function App() {
   const [stateId, setStateId] = useState(readState);
   const [view, setView] = useState(readView);
+  const [showPot, setShowPot] = useState(readShowPot);
   const [hideSensitive, setHideSensitive] = useState(false);
   const page = STATES.find((s) => s.id === stateId);
 
@@ -29,6 +35,7 @@ export default function App() {
     const onPop = () => {
       setStateId(readState());
       setView(readView());
+      setShowPot(readShowPot());
     };
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
@@ -50,13 +57,30 @@ export default function App() {
     setView(v);
   };
 
-  const controls = <PrototypeControls current={stateId} onSelect={selectState} view={view} onView={selectView} />;
+  const selectShowPot = (on) => {
+    const url = new URL(window.location.href);
+    if (on) url.searchParams.delete('pot');
+    else url.searchParams.set('pot', 'hide');
+    window.history.pushState({}, '', url);
+    setShowPot(on);
+  };
+
+  const controls = (
+    <PrototypeControls
+      current={stateId}
+      onSelect={selectState}
+      view={view}
+      onView={selectView}
+      showPot={showPot}
+      onShowPot={selectShowPot}
+    />
+  );
 
   if (view === 'current') {
     return (
       <>
         <Header />
-        <CurrentHomepage key={stateId} page={page} />
+        <CurrentHomepage key={stateId} page={page} showPot={showPot} />
         <Footer />
         {controls}
       </>

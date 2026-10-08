@@ -227,9 +227,10 @@ function FaqBanner() {
   );
 }
 
-export default function CurrentHomepage({ page }) {
+export default function CurrentHomepage({ page, showPot = true }) {
   const [privacy, setPrivacy] = useState(false);
   const cfg = CURRENT[page.id];
+  const pot = showPot ? cfg.pot : null;
   const orders = (page.orders || []).map((k) => ORDERS[k]);
   const basket = cfg.basket || [];
   // Same benefits as the new design's state; window-only benefits sit at the end when closed
@@ -241,7 +242,7 @@ export default function CurrentHomepage({ page }) {
       <main className="cur-content">
         <div className="cur-column">
           <Breadcrumbs privacy={privacy} onPrivacy={setPrivacy} />
-          {cfg.pot && <PotWidget pot={cfg.pot} hidden={privacy} />}
+          {pot && <PotWidget pot={pot} hidden={privacy} />}
 
           {orders.length > 0 && (
             <section className="cur-section">
@@ -263,7 +264,7 @@ export default function CurrentHomepage({ page }) {
             </div>
             <BalancedGrid className="cur-grid" count={benefits.length}>
               {benefits.map((k) => (
-                <BenefitCard key={k} id={k} cfg={cfg} inBasket={basket.includes(k)} showPot={Boolean(cfg.pot)} />
+                <BenefitCard key={k} id={k} cfg={cfg} inBasket={basket.includes(k)} showPot={Boolean(pot)} />
               ))}
             </BalancedGrid>
           </section>

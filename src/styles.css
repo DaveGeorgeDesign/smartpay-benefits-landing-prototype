@@ -777,4 +777,5 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
 .proto-view { display: inline-flex; padding: 3px; border-radius: 999px; background: #1a1a1a; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25); }
 .proto-view button { padding: 7px 14px; border-radius: 999px; color: #fff; font-size: 13px; line-height: 16px; }
 .proto-view button.is-active { background: #fff; color: #1a1a1a; font-weight: 600; }
+.proto-view-label { padding: 7px 6px 7px 12px; color: #bbb; font-size: 13px; line-height: 16px; }
 .proto-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
