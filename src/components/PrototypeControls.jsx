@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { STATES } from '../data.js';
+import { WINDOWS, HELD } from '../data.js';
 
 function CogIcon() {
   return (
@@ -10,13 +10,13 @@ function CogIcon() {
   );
 }
 
-function Segmented({ label, options, value, onChange }) {
+function Segmented({ label, options, value, onChange, disabled }) {
   return (
-    <div className="proto-setting">
+    <div className={`proto-setting${disabled ? ' is-disabled' : ''}`}>
       <span className="proto-group-title">{label}</span>
       <div className="proto-seg" role="group" aria-label={label}>
         {options.map(([v, text]) => (
-          <button type="button" key={text} className={value === v ? 'is-active' : ''} aria-pressed={value === v} onClick={() => onChange(v)}>
+          <button type="button" key={text} disabled={disabled} className={value === v ? 'is-active' : ''} aria-pressed={value === v} onClick={() => onChange(v)}>
             {text}
           </button>
         ))}
@@ -25,12 +25,11 @@ function Segmented({ label, options, value, onChange }) {
   );
 }
 
-// Cog button that opens the prototype settings (version, Benefit Pot, page state).
-// Not part of the design; the choices are kept in the URL (?view, ?pot, ?state).
-export default function PrototypeControls({ current, onSelect, view, onView, showPot, onShowPot }) {
+// Cog button that opens the prototype settings. Not part of the design;
+// the choices are kept in the URL (?view, ?window, ?basket, ?held, ?pot).
+export default function PrototypeControls({ settings, onChange, view, onView, showPot, onShowPot }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
-  const groups = [...new Set(STATES.map((s) => s.group))];
 
   useEffect(() => {
     if (!open) return undefined;
@@ -48,25 +47,17 @@ export default function PrototypeControls({ current, onSelect, view, onView, sho
     <div ref={ref} className={`proto-controls${open ? ' is-open' : ''}`}>
       {open && (
         <div className="proto-panel" role="dialog" aria-label="Prototype settings">
-          <div className="proto-group proto-settings">
-            <Segmented label="Homepage version" options={[['current', 'Current'], ['new', 'New']]} value={view} onChange={onView} />
-            <Segmented label="Benefit Pot" options={[[true, 'Show'], [false, 'Hide']]} value={showPot} onChange={onShowPot} />
-          </div>
-          {groups.map((g) => (
-            <div key={g} className="proto-group">
-              <p className="proto-group-title">{g}</p>
-              {STATES.filter((s) => s.group === g).map((s) => (
-                <button
-                  type="button"
-                  key={s.id}
-                  className={`proto-option${s.id === current ? ' is-active' : ''}`}
-                  onClick={() => { onSelect(s.id); setOpen(false); }}
-                >
-                  {s.name}
-                </button>
-              ))}
-            </div>
-          ))}
+          <Segmented label="Homepage version" options={[['current', 'Current'], ['new', 'New']]} value={view} onChange={onView} />
+          <Segmented label="Election window" options={WINDOWS} value={settings.window} onChange={(w) => onChange({ window: w })} />
+          <Segmented
+            label="Basket"
+            options={[[true, 'Yes'], [false, 'No']]}
+            value={settings.basket}
+            onChange={(b) => onChange({ basket: b })}
+            disabled={settings.window === 'closed'}
+          />
+          <Segmented label="Benefits held" options={HELD.map((n) => [n, String(n)])} value={settings.held} onChange={(n) => onChange({ held: n })} />
+          <Segmented label="Benefit Pot" options={[[true, 'Show'], [false, 'Hide']]} value={showPot} onChange={onShowPot} />
         </div>
       )}
       <button

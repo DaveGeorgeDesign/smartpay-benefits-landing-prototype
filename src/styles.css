@@ -470,7 +470,8 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
 .proto-controls.is-open .proto-fab { transform: rotate(60deg); }
 
 .proto-panel {
-  width: 300px;
+  width: 380px;
+  max-width: calc(100vw - 32px);
   max-height: 70vh;
   overflow-y: auto;
   padding: 8px;
@@ -479,21 +480,7 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
 
-.proto-group + .proto-group { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--black-15); }
 .proto-group-title { padding: 6px 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-secondary); }
-
-.proto-option {
-  display: block;
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 8px;
-  text-align: left;
-  font-size: 14px;
-  line-height: 20px;
-}
-
-.proto-option:hover { background: var(--bg-dark); }
-.proto-option.is-active { background: var(--green-20); color: var(--green-160); font-weight: 600; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1279px) {
@@ -778,9 +765,14 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
 }
 
 /* Segmented switches in the prototype settings panel */
-.proto-settings { padding-bottom: 4px; }
-.proto-setting { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-right: 4px; }
-.proto-setting + .proto-setting { margin-top: 2px; }
+.proto-setting { white-space: nowrap; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 4px 2px 0; }
+.proto-setting + .proto-setting { margin-top: 4px; }
+.proto-setting.is-disabled { opacity: 0.4; }
+.proto-setting.is-disabled button { cursor: not-allowed; }
 .proto-seg { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--bg-dark); }
-.proto-seg button { padding: 5px 12px; border-radius: 999px; font-size: 13px; line-height: 16px; color: var(--text-secondary); }
+.proto-seg button { white-space: nowrap; padding: 5px 12px; border-radius: 999px; font-size: 13px; line-height: 16px; color: var(--text-secondary); }
 .proto-seg button.is-active { background: #1a1a1a; color: #fff; font-weight: 600; }
+@media (max-width: 480px) {
+  .proto-setting .proto-group-title { padding: 6px 4px; }
+  .proto-seg button { padding: 5px 9px; }
+}

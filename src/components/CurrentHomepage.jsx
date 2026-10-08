@@ -8,7 +8,7 @@ import {
 
 // The existing benefits homepage, rebuilt from the Figma "Benefits Landing Page - Benefit Pots"
 // frame (node 48:8967) and the live Edenred Redux / Boom RG captures (nodes 19:6270, 444:11491),
-// shown in the same eight states as the new design so the two can be compared.
+// shown with the same prototype settings as the new design so the two can be compared.
 
 const img = (name) => `${import.meta.env.BASE_URL}images/${name}`;
 
@@ -16,17 +16,9 @@ const img = (name) => `${import.meta.env.BASE_URL}images/${name}`;
 const NOT_POT_ELIGIBLE = ['payrollGiving', 'mortgage'];
 const WINDOW_DATE = '30/09/2026';
 
-// Per-state differences that the new design expresses through KPIs and tags
-const CURRENT = {
-  closed: { window: 'closed' },
-  open: { window: 'open' },
-  'closes-soon': { window: 'closing' },
-  basket: { window: 'open', basket: ['pmi', 'pension'] },
-  pot: { window: 'open', pot: { remaining: '£1,000', spent: '£200', total: '£1,200', pct: 83 } },
-  one: { window: 'closed', pot: { remaining: '£1,000', spent: '£200', total: '£1,200', pct: 83 } },
-  two: { window: 'closed', pot: { remaining: '£1,000', spent: '£200', total: '£1,200', pct: 83 } },
-  four: { window: 'closed', pot: { remaining: '£860', spent: '£340', total: '£1,200', pct: 72 } },
-};
+// Benefit Pot widget figures, matching the new design's KPIs for the benefits held
+const POT = { remaining: '£1,000', spent: '£200', total: '£1,200', pct: 83 };
+const POT_FOUR = { remaining: '£860', spent: '£340', total: '£1,200', pct: 72 };
 
 function Money({ value, hidden }) {
   if (!hidden || !/£/.test(value)) return value;
@@ -251,16 +243,16 @@ function BasketBenefit({ id, hidden }) {
 
 export default function CurrentHomepage({ page, showPot = true }) {
   const [privacy, setPrivacy] = useState(false);
-  const cfg = CURRENT[page.id];
-  const pot = showPot ? cfg.pot : null;
+  const cfg = { window: page.window };
+  const pot = showPot ? (page.held === 4 ? POT_FOUR : POT) : null;
   // Without pots, drop the pot rows (and Card value, which would then just repeat Total cost)
   const stripPot = (rows) => rows.filter(([k]) => showPot || !/Benefit Pot|Card value/.test(k));
   const orders = (page.orders || []).map((k) => ({ ...ORDERS[k], fields: stripPot(ORDERS[k].fields), summary: stripPot(ORDERS[k].summary) }));
-  const basket = cfg.basket || [];
+  const basket = page.basket ? page.basket.items : [];
   // Same benefits as the new design's state, Cycle to Work and Household & Tech first, then catalogue order;
   // unlike the new design, the current site doesn't move closed window-only benefits to the end
   const order = ['cycle', 'householdTech', ...Object.keys(BENEFITS).filter((k) => k !== 'cycle' && k !== 'householdTech')];
-  const benefits = [...page.available, ...(page.election || [])]
+  const benefits = [...page.available, ...page.election]
     .map((c) => c.key)
     .sort((a, b) => order.indexOf(a) - order.indexOf(b));
 

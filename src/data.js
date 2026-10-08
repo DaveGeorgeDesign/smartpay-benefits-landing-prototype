@@ -188,79 +188,56 @@ const kpis = ({ total, tax, active, monthly, pot, potPct, tech, techPct }) => [
   { key: 'tech', label: '💻 Household & Tech', value: tech, note: 'of £2,000 loan available', progress: techPct },
 ];
 
-export const STATES = [
-  {
-    id: 'closed',
-    group: 'New user - no benefits',
-    name: 'Election window closed',
-    intro: NEW_USER_INTRO,
-    available: ALWAYS_ON.map((k) => ({ key: k })),
-    election: [{ key: 'pmi' }, { key: 'pension' }],
-  },
-  {
-    id: 'open',
-    group: 'New user - no benefits',
-    name: 'Election window open',
-    intro: NEW_USER_INTRO,
-    available: ALL_OPEN.map((k) => ({ key: k, tag: BENEFITS[k].electionWindow ? OPEN_TAG : undefined })),
-  },
-  {
-    id: 'closes-soon',
-    group: 'New user - no benefits',
-    name: 'Election window closes soon',
-    intro: NEW_USER_INTRO,
-    available: ALL_OPEN.map((k) => ({ key: k })),
-  },
-  {
-    id: 'basket',
-    group: 'New user - no benefits',
-    name: 'Window open - benefits in basket',
-    intro: NEW_USER_INTRO,
-    basket: { count: 2 },
-    available: ALL_OPEN.map((k) => ({ key: k, tag: BENEFITS[k].electionWindow ? OPEN_TAG : undefined })),
-  },
-  {
-    id: 'pot',
-    group: 'New user - no benefits',
-    name: 'Window open - Benefit Pot module',
-    intro: NEW_USER_INTRO,
-    kpis: [
-      { key: 'pot', label: '💰 Benefit Pot', value: '£1,000', note: 'of £1,200 left to spend', progress: 83 },
-      { key: 'tech', label: '💻 Household & Tech', value: '£1,000', note: 'of £2,000 loan available', progress: 50 },
-    ],
-    available: ALL_OPEN.map((k) => ({ key: k, tag: BENEFITS[k].electionWindow ? OPEN_TAG : undefined })),
-  },
-  {
-    id: 'one',
-    group: 'Engaged user - has benefits',
-    name: 'Single benefit - window closed',
-    intro: ENGAGED_INTRO,
-    kpis: kpis({ total: '£1,240', tax: '£318', active: 1, monthly: '£103.33', pot: '£1,000', potPct: 83, tech: '£1,000', techPct: 50 }),
-    orders: ['householdTech'],
-    available: ALWAYS_ON.filter((k) => k !== 'householdTech').map((k) => ({ key: k })),
-    election: [{ key: 'pmi' }, { key: 'pension' }],
-  },
-  {
-    id: 'two',
-    group: 'Engaged user - has benefits',
-    name: '2 benefits - window closed',
-    intro: ENGAGED_INTRO,
-    kpis: kpis({ total: '£1,240', tax: '£318', active: 2, monthly: '£103.33', pot: '£1,000', potPct: 83, tech: '£1,000', techPct: 50 }),
-    orders: ['householdTech', 'pmi'],
-    available: ALWAYS_ON.filter((k) => k !== 'householdTech').map((k) => ({ key: k })),
-    election: [{ key: 'pension' }],
-  },
-  {
-    id: 'four',
-    group: 'Engaged user - has benefits',
-    name: '4 benefits - window closed',
-    intro: ENGAGED_INTRO,
-    kpis: kpis({ total: '£2,232', tax: '£570', active: 4, monthly: '£185.99', pot: '£860', potPct: 72, tech: '£1,000', techPct: 50 }),
-    orders: ['householdTech', 'cycle', 'pmi', 'pai'],
-    available: ALWAYS_ON.filter((k) => k !== 'householdTech' && k !== 'cycle').map((k) => ({ key: k })),
-    election: [{ key: 'pension' }],
-  },
+// The page is built from the prototype settings: election window, basket and how many benefits are held.
+// Figma draws 1, 2 and 4 benefits with the window closed; other combinations reuse the same pieces.
+export const WINDOWS = [['open', 'Open'], ['closing', 'Closes soon'], ['closed', 'Closed']];
+export const HELD = [0, 1, 2, 4];
+
+const HELD_ORDERS = { 0: [], 1: ['householdTech'], 2: ['householdTech', 'pmi'], 4: ['householdTech', 'cycle', 'pmi', 'pai'] };
+const HELD_KPIS = {
+  1: kpis({ total: '£1,240', tax: '£318', active: 1, monthly: '£103.33', pot: '£1,000', potPct: 83, tech: '£1,000', techPct: 50 }),
+  2: kpis({ total: '£1,240', tax: '£318', active: 2, monthly: '£103.33', pot: '£1,000', potPct: 83, tech: '£1,000', techPct: 50 }),
+  4: kpis({ total: '£2,232', tax: '£570', active: 4, monthly: '£185.99', pot: '£860', potPct: 72, tech: '£1,000', techPct: 50 }),
+};
+// New users only see the Benefit Pot module KPIs, so these show only when pots are shown
+const POT_MODULE_KPIS = [
+  { key: 'pot', label: '💰 Benefit Pot', value: '£1,000', note: 'of £1,200 left to spend', progress: 83 },
+  { key: 'tech', label: '💻 Household & Tech', value: '£1,000', note: 'of £2,000 loan available', progress: 50 },
 ];
+// Window benefits a new basket is filled from, skipping any already held
+const BASKET_CANDIDATES = ['pmi', 'pension', 'ev', 'healthCash'];
+
+export function buildPage({ window, basket, held }) {
+  const orders = HELD_ORDERS[held];
+  const notHeld = (k) => !orders.includes(k);
+  const closed = window === 'closed';
+  const basketItems = basket && !closed ? BASKET_CANDIDATES.filter(notHeld).slice(0, 2) : [];
+  return {
+    window,
+    held,
+    intro: held ? ENGAGED_INTRO : NEW_USER_INTRO,
+    kpis: held ? HELD_KPIS[held] : POT_MODULE_KPIS,
+    orders,
+    basket: basketItems.length ? { count: basketItems.length, items: basketItems } : undefined,
+    available: (closed ? ALWAYS_ON : ALL_OPEN).filter(notHeld).map((k) => ({
+      key: k,
+      tag: window === 'open' && BENEFITS[k].electionWindow ? OPEN_TAG : undefined,
+    })),
+    election: closed ? ['pmi', 'pension'].filter(notHeld).map((k) => ({ key: k })) : [],
+  };
+}
+
+// Old ?state= links, mapped to their settings
+export const LEGACY_STATES = {
+  closed: { window: 'closed', basket: false, held: 0 },
+  open: { window: 'open', basket: false, held: 0 },
+  'closes-soon': { window: 'closing', basket: false, held: 0 },
+  basket: { window: 'open', basket: true, held: 0 },
+  pot: { window: 'open', basket: false, held: 0, pot: true },
+  one: { window: 'closed', basket: false, held: 1 },
+  two: { window: 'closed', basket: false, held: 2 },
+  four: { window: 'closed', basket: false, held: 4 },
+};
 
 export const FAQS = [
   {

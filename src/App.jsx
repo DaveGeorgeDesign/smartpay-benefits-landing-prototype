@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { STATES, ORDERS } from './data.js';
+import { ORDERS, WINDOWS, HELD, LEGACY_STATES, buildPage } from './data.js';
 import Header from './components/Header.jsx';
 import { BenefitCard, OrderCard, WideOrderCard, Kpi } from './components/Cards.jsx';
 import { Breadcrumbs, SensitiveToggle, BasketBanner, Faq, Footer } from './components/Sections.jsx';
@@ -7,21 +7,36 @@ import PrototypeControls from './components/PrototypeControls.jsx';
 import BalancedGrid from './components/BalancedGrid.jsx';
 import CurrentHomepage from './components/CurrentHomepage.jsx';
 
-const DEFAULT_STATE = 'four';
+const DEFAULT_SETTINGS = { window: 'closed', basket: false, held: 4 };
 
-function readState() {
-  const id = new URLSearchParams(window.location.search).get('state');
-  return STATES.some((s) => s.id === id) ? id : DEFAULT_STATE;
+// Prototype settings live in the URL: ?window=open|closing|closed&basket=yes&held=0|1|2|4.
+// Old ?state= links still work by mapping to their settings.
+function readSettings() {
+  const q = new URLSearchParams(window.location.search);
+  const legacy = LEGACY_STATES[q.get('state')];
+  const base = legacy || DEFAULT_SETTINGS;
+  const win = WINDOWS.some(([id]) => id === q.get('window')) ? q.get('window') : base.window;
+  const held = HELD.includes(Number(q.get('held'))) && q.has('held') ? Number(q.get('held')) : base.held;
+  const basket = q.has('basket') ? q.get('basket') === 'yes' : base.basket;
+  return { window: win, basket: basket && win !== 'closed', held };
 }
 
-// ?view=current shows the existing homepage in the same state, for comparison
+function writeSettings(url, { window: win, basket, held }) {
+  url.searchParams.set('window', win);
+  url.searchParams.set('held', String(held));
+  if (basket) url.searchParams.set('basket', 'yes');
+  else url.searchParams.delete('basket');
+}
+
+// ?view=current shows the existing homepage with the same settings, for comparison
 function readView() {
   return new URLSearchParams(window.location.search).get('view') === 'current' ? 'current' : 'new';
 }
 
 // Benefit Pots aren't offered yet, so they're hidden in both views unless ?pot=show
 function readShowPot() {
-  return new URLSearchParams(window.location.search).get('pot') === 'show';
+  const q = new URLSearchParams(window.location.search);
+  return q.get('pot') === 'show' || Boolean(LEGACY_STATES[q.get('state')]?.pot);
 }
 
 // Drops the Benefit Pot rows from an order, plus Card value, which would then just repeat Total cost
@@ -31,15 +46,15 @@ function withoutPot(order) {
 }
 
 export default function App() {
-  const [stateId, setStateId] = useState(readState);
+  const [settings, setSettings] = useState(readSettings);
   const [view, setView] = useState(readView);
   const [showPot, setShowPot] = useState(readShowPot);
   const [hideSensitive, setHideSensitive] = useState(false);
-  const page = STATES.find((s) => s.id === stateId);
+  const page = buildPage(settings);
 
   useEffect(() => {
     const onPop = () => {
-      setStateId(readState());
+      setSettings(readSettings());
       setView(readView());
       setShowPot(readShowPot());
     };
@@ -47,12 +62,23 @@ export default function App() {
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
-  const selectState = (id) => {
+  // Rewrites an old ?state= link as its settings, so later changes start from them
+  useEffect(() => {
     const url = new URL(window.location.href);
-    url.searchParams.set('state', id);
+    if (!url.searchParams.has('state')) return;
+    url.searchParams.delete('state');
+    writeSettings(url, settings);
+    if (showPot) url.searchParams.set('pot', 'show');
+    window.history.replaceState({}, '', url);
+  }, []);
+
+  const changeSettings = (change) => {
+    const next = { ...settings, ...change };
+    if (next.window === 'closed') next.basket = false;
+    const url = new URL(window.location.href);
+    writeSettings(url, next);
     window.history.pushState({}, '', url);
-    setStateId(id);
-    window.scrollTo({ top: 0 });
+    setSettings(next);
   };
 
   const selectView = (v) => {
@@ -75,8 +101,8 @@ export default function App() {
   const controls = (
     <PrototypeControls
       key="prototype-controls"
-      current={stateId}
-      onSelect={selectState}
+      settings={settings}
+      onChange={changeSettings}
       view={view}
       onView={selectView}
       showPot={showPot}
@@ -88,7 +114,7 @@ export default function App() {
     return (
       <>
         <Header />
-        <CurrentHomepage key={stateId} page={page} showPot={showPot} />
+        <CurrentHomepage page={page} showPot={showPot} />
         <Footer />
         {controls}
       </>
@@ -97,7 +123,8 @@ export default function App() {
 
   const orders = (page.orders || []).map((k) => (showPot ? ORDERS[k] : withoutPot(ORDERS[k])));
   const hasOrders = orders.length > 0;
-  const kpiList = page.kpis && page.kpis.filter((k) => showPot || k.key !== 'pot');
+  // New users only get the Benefit Pot module KPIs, so none show while pots are hidden
+  const kpiList = showPot ? page.kpis : page.held ? page.kpis.filter((k) => k.key !== 'pot') : null;
 
   return (
     <>
@@ -144,7 +171,7 @@ export default function App() {
             </BalancedGrid>
           </section>
 
-          {page.election && (
+          {page.election.length > 0 && (
             <section className="section">
               <div className="section-heading">
                 <h2 className="section-title">Available during the next Election Window - reopens in 30 days</h2>
