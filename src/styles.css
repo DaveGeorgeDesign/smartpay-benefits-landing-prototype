@@ -230,6 +230,8 @@ img { display: block; }
 /* ---------- KPIs ---------- */
 .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 24px; }
 .kpis-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.kpis-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.kpis-1 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
 .kpi {
   display: flex;
@@ -497,7 +499,7 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
 @media (max-width: 1279px) {
   :root { --page-pad: 40px; }
   .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .kpis-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpis-2, .kpis-1 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .order-fields-wide { flex-wrap: wrap; justify-content: flex-start; }
 }
 

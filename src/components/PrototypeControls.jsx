@@ -37,16 +37,14 @@ export default function PrototypeControls({ current, onSelect, view, onView, sho
             </button>
           ))}
         </div>
-        {view === 'current' && (
-          <div className="proto-view" role="group" aria-label="Benefit Pot">
-            <span className="proto-view-label">Benefit Pot</span>
-            {[[true, 'Show'], [false, 'Hide']].map(([on, label]) => (
-              <button type="button" key={label} className={showPot === on ? 'is-active' : ''} aria-pressed={showPot === on} onClick={() => onShowPot(on)}>
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
+        <div className="proto-view" role="group" aria-label="Benefit Pot">
+          <span className="proto-view-label">Benefit Pot</span>
+          {[[true, 'Show'], [false, 'Hide']].map(([on, label]) => (
+            <button type="button" key={label} className={showPot === on ? 'is-active' : ''} aria-pressed={showPot === on} onClick={() => onShowPot(on)}>
+              {label}
+            </button>
+          ))}
+        </div>
         <button type="button" className="proto-pill" aria-expanded={open} onClick={() => setOpen(!open)}>
           <span className="proto-dot" />
           Prototype state: <strong>{active?.name}</strong>

@@ -19,9 +19,15 @@ function readView() {
   return new URLSearchParams(window.location.search).get('view') === 'current' ? 'current' : 'new';
 }
 
-// ?pot=hide hides the Benefit Pot on the current homepage, which doesn't offer it yet
+// Benefit Pots aren't offered yet, so they're hidden in both views unless ?pot=show
 function readShowPot() {
-  return new URLSearchParams(window.location.search).get('pot') !== 'hide';
+  return new URLSearchParams(window.location.search).get('pot') === 'show';
+}
+
+// Drops the Benefit Pot rows from an order, plus Card value, which would then just repeat Total cost
+function withoutPot(order) {
+  const strip = (rows) => rows && rows.filter(([k]) => !/Benefit Pot|Card value/.test(k));
+  return { ...order, summary: strip(order.summary), wideFields: strip(order.wideFields) };
 }
 
 export default function App() {
@@ -59,8 +65,8 @@ export default function App() {
 
   const selectShowPot = (on) => {
     const url = new URL(window.location.href);
-    if (on) url.searchParams.delete('pot');
-    else url.searchParams.set('pot', 'hide');
+    if (on) url.searchParams.set('pot', 'show');
+    else url.searchParams.delete('pot');
     window.history.pushState({}, '', url);
     setShowPot(on);
   };
@@ -87,8 +93,9 @@ export default function App() {
     );
   }
 
-  const orders = (page.orders || []).map((k) => ORDERS[k]);
+  const orders = (page.orders || []).map((k) => (showPot ? ORDERS[k] : withoutPot(ORDERS[k])));
   const hasOrders = orders.length > 0;
+  const kpiList = page.kpis && page.kpis.filter((k) => showPot || k.key !== 'pot');
 
   return (
     <>
@@ -107,9 +114,9 @@ export default function App() {
 
           {page.basket && <BasketBanner count={page.basket.count} />}
 
-          {page.kpis && (
-            <div className={`kpis kpis-${page.kpis.length}`}>
-              {page.kpis.map((k) => <Kpi key={k.key} kpi={k} hideSensitive={hideSensitive} />)}
+          {kpiList && (
+            <div className={`kpis kpis-${kpiList.length}`}>
+              {kpiList.map((k) => <Kpi key={k.key} kpi={k} hideSensitive={hideSensitive} />)}
             </div>
           )}
 
