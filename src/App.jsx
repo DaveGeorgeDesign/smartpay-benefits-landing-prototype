@@ -28,9 +28,11 @@ function writeSettings(url, { window: win, basket, held }) {
   else url.searchParams.delete('basket');
 }
 
-// ?view=current shows the existing homepage with the same settings, for comparison
+// ?view=a shows the existing homepage (Version A) with the same settings, for comparison.
+// Neutral names so test participants can't tell which is the redesign; old ?view=current links still work.
 function readView() {
-  return new URLSearchParams(window.location.search).get('view') === 'current' ? 'current' : 'new';
+  const v = new URLSearchParams(window.location.search).get('view');
+  return v === 'a' || v === 'current' ? 'current' : 'new';
 }
 
 // Benefit Pots aren't offered yet, so they're hidden in both views unless ?pot=show
@@ -82,7 +84,7 @@ export default function App() {
 
   const selectView = (v) => {
     const url = new URL(window.location.href);
-    if (v === 'current') url.searchParams.set('view', v);
+    if (v === 'current') url.searchParams.set('view', 'a');
     else url.searchParams.delete('view');
     window.history.pushState({}, '', url);
     setView(v);

@@ -47,7 +47,7 @@ export default function PrototypeControls({ settings, onChange, view, onView, sh
     <div ref={ref} className={`proto-controls${open ? ' is-open' : ''}`}>
       {open && (
         <div className="proto-panel" role="dialog" aria-label="Prototype settings">
-          <Segmented label="Homepage version" options={[['current', 'Current'], ['new', 'New']]} value={view} onChange={onView} />
+          <Segmented label="Homepage version" options={[['current', 'Version A'], ['new', 'Version B']]} value={view} onChange={onView} />
           <Segmented label="Election window" options={WINDOWS} value={settings.window} onChange={(w) => onChange({ window: w })} />
           <Segmented label="Basket" options={[[true, 'Yes'], [false, 'No']]} value={settings.basket} onChange={(b) => onChange({ basket: b })} />
           <Segmented label="Benefits held" options={HELD.map((n) => [n, String(n)])} value={settings.held} onChange={(n) => onChange({ held: n })} />
