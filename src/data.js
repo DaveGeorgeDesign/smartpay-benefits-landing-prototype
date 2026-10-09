@@ -1,6 +1,8 @@
 // Benefit catalogue and the eight page states from the Figma file
 // "DGD - SmartPay - Benefits Landing Page" (Landing Page section, node 2214:16713).
 
+import { WINDOW_DAYS, WINDOW_DATE, dayMonth } from './dates.js';
+
 const img = (name) => `${import.meta.env.BASE_URL}images/${name}.jpg`;
 
 // Card copy. `closed` overrides apply when the card sits in the
@@ -177,7 +179,7 @@ const ENGAGED_INTRO = 'Your benefits are really paying off - but there’s so mu
 const ALL_OPEN = ['pmi', 'pension', 'cycle', 'householdTech', 'ev', 'healthCash', 'seasonTicket', 'virtualGp', 'payrollGiving', 'willWriting', 'mortgage', 'gymflex'];
 const ALWAYS_ON = ALL_OPEN.filter((k) => !BENEFITS[k].electionWindow);
 
-const OPEN_TAG = { kind: 'open', label: 'Open now - closes in 30d' };
+const OPEN_TAG = { kind: 'open', label: `Open now - closes in ${WINDOW_DAYS}d` };
 
 const kpis = ({ total, tax, active, monthly, pot, potPct, tech, techPct }) => [
   { key: 'total', label: '🌟 Total benefits value', value: total, note: 'value of benefits held' },
@@ -244,7 +246,7 @@ export const LEGACY_STATES = {
 export const FAQS = [
   {
     q: 'What is the Election window and when does it close?',
-    a: 'The Election window is the period when you can apply for or change certain benefits, such as Holiday Trading and Payroll Giving. It is open now and closes at 23:59 on 30 September. Outside this window these benefits stay locked until the next one opens.',
+    a: `The Election window is the period when you can apply for or change certain benefits, such as Holiday Trading and Payroll Giving. It is open now and closes at 23:59 on ${dayMonth(WINDOW_DATE)}. Outside this window these benefits stay locked until the next one opens.`,
   },
   // Answers 2–7 are placeholders pending real copy (per the Figma component notes)
   { q: 'How does salary sacrifice save me money?', a: 'Answer copy to follow.' },
