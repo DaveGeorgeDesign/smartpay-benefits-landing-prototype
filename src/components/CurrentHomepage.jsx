@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BENEFITS, ORDERS } from '../data.js';
 import BalancedGrid from './BalancedGrid.jsx';
+import { WINDOW_DATE as WINDOW_DATE_VALUE, EFFECTIVE_DATE, POT_RENEWAL_DAYS, POT_RENEWAL_DATE, ddmmyyyy, longDate } from '../dates.js';
 import {
   CheckCircleIcon, BlockedIcon, RenewIcon, StarOutlineSmallIcon, EyeIcon, HomeIcon, ChevronForwardIcon,
   DetailsChevronIcon, FileDownloadIcon, BasketIllustration, CartIcon,
@@ -14,7 +15,7 @@ const img = (name) => `${import.meta.env.BASE_URL}images/${name}`;
 
 // Benefits paid for through salary only, so never Benefit Pot eligible
 const NOT_POT_ELIGIBLE = ['payrollGiving', 'mortgage'];
-const WINDOW_DATE = '30/09/2026';
+const WINDOW_DATE = ddmmyyyy(WINDOW_DATE_VALUE);
 
 // Benefit Pot widget figures, matching the new design's KPIs for the benefits held
 const POT = { remaining: '£1,000', spent: '£200', total: '£1,200', pct: 83 };
@@ -81,8 +82,8 @@ function PotWidget({ pot, hidden }) {
       </div>
       <span className="cur-divider" />
       <div className="cur-pot-renewal">
-        <span className="cur-badge"><RenewIcon />Renews in 245 days</span>
-        <p className="cur-small cur-muted">5 February 2027</p>
+        <span className="cur-badge"><RenewIcon />Renews in {POT_RENEWAL_DAYS} days</span>
+        <p className="cur-small cur-muted">{longDate(POT_RENEWAL_DATE)}</p>
       </div>
     </section>
   );
@@ -232,7 +233,7 @@ function BasketBenefit({ id, hidden }) {
       <dl className="cur-active-fields">
         <div><dt>You Pay</dt><dd><Money value="£XXXX" hidden={hidden} /></dd></div>
         <div><dt>Employer Pays</dt><dd><Money value="£XXXX" hidden={hidden} /></dd></div>
-        <div><dt>Effective From</dt><dd>01/08/2026</dd></div>
+        <div><dt>Effective From</dt><dd>{ddmmyyyy(EFFECTIVE_DATE)}</dd></div>
       </dl>
       <div className="cur-actions">
         <a href="#" className="cur-button cur-button-secondary">Benefit Page</a>

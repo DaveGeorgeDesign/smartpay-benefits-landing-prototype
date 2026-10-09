@@ -6,6 +6,7 @@ import { Breadcrumbs, SensitiveToggle, BasketBanner, Faq, Footer } from './compo
 import PrototypeControls from './components/PrototypeControls.jsx';
 import BalancedGrid from './components/BalancedGrid.jsx';
 import CurrentHomepage from './components/CurrentHomepage.jsx';
+import { WINDOW_DAYS, WINDOW_DATE, dmyyyy } from './dates.js';
 
 const DEFAULT_SETTINGS = { window: 'closed', basket: false, held: 4 };
 
@@ -175,9 +176,9 @@ export default function App() {
           {page.election.length > 0 && (
             <section className="section">
               <div className="section-heading">
-                <h2 className="section-title">Available during the next Election Window - reopens in 30 days</h2>
+                <h2 className="section-title">Available during the next Election Window - reopens in {WINDOW_DAYS} days</h2>
                 <p className="section-subtitle">
-                  Some benefits are only available to apply for during set periods called Election Windows. The next one opens 30/9/2026.
+                  Some benefits are only available to apply for during set periods called Election Windows. The next one opens {dmyyyy(WINDOW_DATE)}.
                 </p>
               </div>
               <BalancedGrid className="card-grid" count={page.election.length}>
