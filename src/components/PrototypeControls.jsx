@@ -26,8 +26,9 @@ function Segmented({ label, options, value, onChange }) {
 }
 
 // Cog button that opens the prototype settings. Not part of the design;
-// the choices are kept in the URL (?view, ?window, ?basket, ?held, ?pot).
-export default function PrototypeControls({ settings, onChange, view, onView, showPot, onShowPot }) {
+// the choices are kept in the URL (?view, ?window, ?basket, ?held).
+// Benefit Pots aren't a live feature, so they have no setting here; ?pot=show still turns them on.
+export default function PrototypeControls({ settings, onChange, view, onView }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -51,7 +52,6 @@ export default function PrototypeControls({ settings, onChange, view, onView, sh
           <Segmented label="Election window" options={WINDOWS} value={settings.window} onChange={(w) => onChange({ window: w })} />
           <Segmented label="Basket" options={[[true, 'Yes'], [false, 'No']]} value={settings.basket} onChange={(b) => onChange({ basket: b })} />
           <Segmented label="Benefits held" options={HELD.map((n) => [n, String(n)])} value={settings.held} onChange={(n) => onChange({ held: n })} />
-          <Segmented label="Benefit Pot" options={[[true, 'Show'], [false, 'Hide']]} value={showPot} onChange={onShowPot} />
         </div>
       )}
       <button
