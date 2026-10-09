@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FAQS, FOOTER_LINKS } from '../data.js';
+import { BENEFITS, FAQS, FOOTER_LINKS } from '../data.js';
 import { ChevronDownIcon, ChevronForwardIcon, HomeIcon, BasketIllustration, TailArrowIcon } from './Icons.jsx';
 
 const FOOTER_LOGO = `${import.meta.env.BASE_URL}images/reward-gateway-edenred.png`;
@@ -29,13 +29,18 @@ export function SensitiveToggle({ on, onChange }) {
   );
 }
 
-export function BasketBanner({ count }) {
+export function BasketBanner({ items }) {
+  const names = items.map((k) => BENEFITS[k].title);
   return (
     <div className="basket-banner">
       <BasketIllustration />
       <div className="basket-text">
-        <p className="basket-title">You’ve got {count} items in your Benefits Basket</p>
-        <p className="basket-body">You’ll need to complete your order before you can enjoy your benefits. Complete your order now.</p>
+        <p className="basket-title">You’ve got {items.length} items in your Benefits Basket</p>
+        <p className="basket-body">
+          <strong>{names[0]}</strong>
+          {names.slice(1).map((n, i) => <span key={n}>{i === names.length - 2 ? ' and ' : ', '}<strong>{n}</strong></span>)}
+          {' '}{names.length > 1 ? 'are' : 'is'} waiting in your basket. You’ll need to complete your order before you can enjoy your benefits.
+        </p>
       </div>
       <a href="#" className="primary-button">
         Complete my order

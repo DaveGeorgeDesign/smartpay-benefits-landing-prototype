@@ -230,6 +230,8 @@ img { display: block; }
 /* ---------- KPIs ---------- */
 .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 24px; }
 .kpis-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.kpis-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.kpis-1 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
 .kpi {
   display: flex;
@@ -399,6 +401,7 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
 .basket-text { display: flex; flex-direction: column; gap: 10px; flex: 1; min-width: 0; font-family: var(--font-inter); }
 .basket-title { font-size: 22px; line-height: 28px; font-weight: 700; color: #1a1a1a; }
 .basket-body { font-size: 16px; line-height: 26px; color: #4d4d4d; }
+.basket-body strong { font-weight: 600; color: #1a1a1a; }
 
 /* ---------- FAQ ---------- */
 .faq { background: #fff; padding: 64px var(--page-pad) 72px; }
@@ -451,24 +454,25 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
   font-family: var(--font-inter);
 }
 
-.proto-pill {
+.proto-fab {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border-radius: 999px;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   background: #1a1a1a;
   color: #fff;
-  font-size: 13px;
-  line-height: 16px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease;
 }
 
-.proto-pill strong { font-weight: 600; }
-.proto-dot { width: 8px; height: 8px; border-radius: 50%; background: #77dd77; }
+.proto-fab:hover { background: #333; }
+.proto-controls.is-open .proto-fab { transform: rotate(60deg); }
 
 .proto-panel {
-  width: 300px;
+  width: 380px;
+  max-width: calc(100vw - 32px);
   max-height: 70vh;
   overflow-y: auto;
   padding: 8px;
@@ -477,27 +481,13 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
 
-.proto-group + .proto-group { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--black-15); }
 .proto-group-title { padding: 6px 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-secondary); }
-
-.proto-option {
-  display: block;
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 8px;
-  text-align: left;
-  font-size: 14px;
-  line-height: 20px;
-}
-
-.proto-option:hover { background: var(--bg-dark); }
-.proto-option.is-active { background: var(--green-20); color: var(--green-160); font-weight: 600; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1279px) {
   :root { --page-pad: 40px; }
   .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .kpis-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpis-2, .kpis-1 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .order-fields-wide { flex-wrap: wrap; justify-content: flex-start; }
 }
 
@@ -677,6 +667,8 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
 }
 
 .cur-chip-green { background: var(--green-20); color: var(--green-160); }
+.cur-chip-grey { background: var(--black-15); color: var(--text-primary); }
+.cur-chip-red { background: #fde3e3; color: #c4122f; }
 
 .cur-active-fields { display: flex; flex-wrap: wrap; gap: 8px 40px; }
 .cur-active-fields dt,
@@ -773,8 +765,13 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
   .cur-faq { flex-direction: column; align-items: flex-start; }
 }
 
-/* Current / New switch in the prototype controls */
-.proto-view { display: inline-flex; padding: 3px; border-radius: 999px; background: #1a1a1a; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25); }
-.proto-view button { padding: 7px 14px; border-radius: 999px; color: #fff; font-size: 13px; line-height: 16px; }
-.proto-view button.is-active { background: #fff; color: #1a1a1a; font-weight: 600; }
-.proto-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+/* Segmented switches in the prototype settings panel */
+.proto-setting { white-space: nowrap; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 4px 2px 0; }
+.proto-setting + .proto-setting { margin-top: 4px; }
+.proto-seg { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--bg-dark); }
+.proto-seg button { white-space: nowrap; padding: 5px 12px; border-radius: 999px; font-size: 13px; line-height: 16px; color: var(--text-secondary); }
+.proto-seg button.is-active { background: #1a1a1a; color: #fff; font-weight: 600; }
+@media (max-width: 480px) {
+  .proto-setting .proto-group-title { padding: 6px 4px; }
+  .proto-seg button { padding: 5px 9px; }
+}

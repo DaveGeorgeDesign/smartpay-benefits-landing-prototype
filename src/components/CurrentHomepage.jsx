@@ -3,12 +3,12 @@ import { BENEFITS, ORDERS } from '../data.js';
 import BalancedGrid from './BalancedGrid.jsx';
 import {
   CheckCircleIcon, BlockedIcon, RenewIcon, StarOutlineSmallIcon, EyeIcon, HomeIcon, ChevronForwardIcon,
-  DetailsChevronIcon, FileDownloadIcon, BasketIllustration,
+  DetailsChevronIcon, FileDownloadIcon, BasketIllustration, CartIcon,
 } from './Icons.jsx';
 
 // The existing benefits homepage, rebuilt from the Figma "Benefits Landing Page - Benefit Pots"
 // frame (node 48:8967) and the live Edenred Redux / Boom RG captures (nodes 19:6270, 444:11491),
-// shown in the same eight states as the new design so the two can be compared.
+// shown with the same prototype settings as the new design so the two can be compared.
 
 const img = (name) => `${import.meta.env.BASE_URL}images/${name}`;
 
@@ -16,17 +16,9 @@ const img = (name) => `${import.meta.env.BASE_URL}images/${name}`;
 const NOT_POT_ELIGIBLE = ['payrollGiving', 'mortgage'];
 const WINDOW_DATE = '30/09/2026';
 
-// Per-state differences that the new design expresses through KPIs and tags
-const CURRENT = {
-  closed: { window: 'closed' },
-  open: { window: 'open' },
-  'closes-soon': { window: 'closing' },
-  basket: { window: 'open', basket: ['pmi', 'pension'] },
-  pot: { window: 'open', pot: { remaining: '£1,000', spent: '£200', total: '£1,200', pct: 83 } },
-  one: { window: 'closed', pot: { remaining: '£1,000', spent: '£200', total: '£1,200', pct: 83 } },
-  two: { window: 'closed', pot: { remaining: '£1,000', spent: '£200', total: '£1,200', pct: 83 } },
-  four: { window: 'closed', pot: { remaining: '£860', spent: '£340', total: '£1,200', pct: 72 } },
-};
+// Benefit Pot widget figures, matching the new design's KPIs for the benefits held
+const POT = { remaining: '£1,000', spent: '£200', total: '£1,200', pct: 83 };
+const POT_FOUR = { remaining: '£860', spent: '£340', total: '£1,200', pct: 72 };
 
 function Money({ value, hidden }) {
   if (!hidden || !/£/.test(value)) return value;
@@ -101,7 +93,11 @@ function ActiveBenefit({ order, hidden }) {
   const detailsId = `cur-${order.ref}`;
   return (
     <article className="cur-panel cur-active">
-      <span className="cur-chip cur-chip-green"><CheckCircleIcon size={12} color="currentColor" />Active</span>
+      {order.status === 'closed' ? (
+        <span className="cur-chip cur-chip-grey"><BlockedIcon size={12} color="currentColor" />Closed</span>
+      ) : (
+        <span className="cur-chip cur-chip-green"><CheckCircleIcon size={12} color="currentColor" />Active</span>
+      )}
       <h3 className="cur-active-title">{order.title}</h3>
       <dl className="cur-active-fields">
         {order.fields.map(([k, v]) => (
@@ -227,13 +223,38 @@ function FaqBanner() {
   );
 }
 
-export default function CurrentHomepage({ page }) {
+// Benefits added to the basket during the window, before the order exists
+function BasketBenefit({ id, hidden }) {
+  return (
+    <article className="cur-panel cur-active">
+      <span className="cur-chip cur-chip-red"><CartIcon size={12} color="currentColor" />In basket</span>
+      <h3 className="cur-active-title">{BENEFITS[id].title}</h3>
+      <dl className="cur-active-fields">
+        <div><dt>You Pay</dt><dd><Money value="£XXXX" hidden={hidden} /></dd></div>
+        <div><dt>Employer Pays</dt><dd><Money value="£XXXX" hidden={hidden} /></dd></div>
+        <div><dt>Effective From</dt><dd>01/08/2026</dd></div>
+      </dl>
+      <div className="cur-actions">
+        <a href="#" className="cur-button cur-button-secondary">Benefit Page</a>
+      </div>
+    </article>
+  );
+}
+
+export default function CurrentHomepage({ page, showPot = true }) {
   const [privacy, setPrivacy] = useState(false);
-  const cfg = CURRENT[page.id];
-  const orders = (page.orders || []).map((k) => ORDERS[k]);
-  const basket = cfg.basket || [];
-  // Same benefits as the new design's state; window-only benefits sit at the end when closed
-  const benefits = [...page.available, ...(page.election || [])].map((c) => c.key);
+  const cfg = { window: page.window };
+  const pot = showPot ? (page.held === 4 ? POT_FOUR : POT) : null;
+  // Without pots, drop the pot rows (and Card value, which would then just repeat Total cost)
+  const stripPot = (rows) => rows.filter(([k]) => showPot || !/Benefit Pot|Card value/.test(k));
+  const orders = (page.orders || []).map((k) => ({ ...ORDERS[k], fields: stripPot(ORDERS[k].fields), summary: stripPot(ORDERS[k].summary) }));
+  const basket = page.basket ? page.basket.items : [];
+  // Same benefits as the new design's state, Cycle to Work and Household & Tech first, then catalogue order;
+  // unlike the new design, the current site doesn't move closed window-only benefits to the end
+  const order = ['cycle', 'householdTech', ...Object.keys(BENEFITS).filter((k) => k !== 'cycle' && k !== 'householdTech')];
+  const benefits = [...page.available, ...page.election]
+    .map((c) => c.key)
+    .sort((a, b) => order.indexOf(a) - order.indexOf(b));
 
   return (
     <div className="current">
@@ -241,12 +262,13 @@ export default function CurrentHomepage({ page }) {
       <main className="cur-content">
         <div className="cur-column">
           <Breadcrumbs privacy={privacy} onPrivacy={setPrivacy} />
-          {cfg.pot && <PotWidget pot={cfg.pot} hidden={privacy} />}
+          {pot && <PotWidget pot={pot} hidden={privacy} />}
 
-          {orders.length > 0 && (
+          {(orders.length > 0 || basket.length > 0) && (
             <section className="cur-section">
               <h2 className="cur-section-title">Active Benefits</h2>
               <div className="cur-active-list">
+                {basket.map((k) => <BasketBenefit key={k} id={k} hidden={privacy} />)}
                 {orders.map((o) => <ActiveBenefit key={o.ref} order={o} hidden={privacy} />)}
               </div>
             </section>
@@ -263,7 +285,7 @@ export default function CurrentHomepage({ page }) {
             </div>
             <BalancedGrid className="cur-grid" count={benefits.length}>
               {benefits.map((k) => (
-                <BenefitCard key={k} id={k} cfg={cfg} inBasket={basket.includes(k)} showPot={Boolean(cfg.pot)} />
+                <BenefitCard key={k} id={k} cfg={cfg} inBasket={basket.includes(k)} showPot={Boolean(pot)} />
               ))}
             </BalancedGrid>
           </section>
