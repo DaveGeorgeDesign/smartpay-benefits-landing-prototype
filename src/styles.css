@@ -401,6 +401,7 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
 .basket-text { display: flex; flex-direction: column; gap: 10px; flex: 1; min-width: 0; font-family: var(--font-inter); }
 .basket-title { font-size: 22px; line-height: 28px; font-weight: 700; color: #1a1a1a; }
 .basket-body { font-size: 16px; line-height: 26px; color: #4d4d4d; }
+.basket-body strong { font-weight: 600; color: #1a1a1a; }
 
 /* ---------- FAQ ---------- */
 .faq { background: #fff; padding: 64px var(--page-pad) 72px; }

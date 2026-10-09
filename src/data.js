@@ -220,7 +220,7 @@ export function buildPage({ window, basket, held }) {
     intro: held ? ENGAGED_INTRO : NEW_USER_INTRO,
     kpis: held ? HELD_KPIS[held] : POT_MODULE_KPIS,
     orders,
-    basket: basketItems.length ? { count: basketItems.length, items: basketItems } : undefined,
+    basket: basketItems.length ? { items: basketItems } : undefined,
     available: (closed ? ALWAYS_ON : ALL_OPEN).filter(notHeld).map((k) => ({
       key: k,
       tag: window === 'open' && BENEFITS[k].electionWindow ? OPEN_TAG : undefined,

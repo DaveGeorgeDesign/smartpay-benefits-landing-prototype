@@ -140,7 +140,7 @@ export default function App() {
             </div>
           </div>
 
-          {page.basket && <BasketBanner count={page.basket.count} />}
+          {page.basket && <BasketBanner items={page.basket.items} />}
 
           {kpiList && (
             <div className={`kpis kpis-${kpiList.length}`}>
