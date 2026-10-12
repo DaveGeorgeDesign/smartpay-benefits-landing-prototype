@@ -173,7 +173,7 @@ export const ORDERS = {
   },
 };
 
-const NEW_USER_INTRO = 'Start saving on tax, National Insurances, fees and interest - choose your first benefit now!';
+const NEW_USER_INTRO = 'Start saving on tax, National Insurance, fees and interest - choose your first benefit now!';
 const ENGAGED_INTRO = 'Your benefits are really paying off - but there’s so much more available!';
 
 const ALL_OPEN = ['pmi', 'pension', 'cycle', 'householdTech', 'ev', 'healthCash', 'seasonTicket', 'virtualGp', 'payrollGiving', 'willWriting', 'mortgage', 'gymflex'];
