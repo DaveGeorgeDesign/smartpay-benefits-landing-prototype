@@ -8,9 +8,10 @@ import BalancedGrid from './components/BalancedGrid.jsx';
 import CurrentHomepage from './components/CurrentHomepage.jsx';
 import { WINDOW_DAYS, WINDOW_DATE, dmyyyy } from './dates.js';
 
-const DEFAULT_SETTINGS = { window: 'closed', basket: false, held: 4 };
+const DEFAULT_SETTINGS = { window: 'closed', basket: true, held: 4 };
 
-// Prototype settings live in the URL: ?window=open|closing|closed&basket=yes&held=0|1|2|4.
+// Prototype settings live in the URL: ?window=open|closing|closed&basket=yes|no&held=0|1|2|4.
+// The basket has items unless the link says basket=no.
 // Old ?state= links still work by mapping to their settings.
 function readSettings() {
   const q = new URLSearchParams(window.location.search);
@@ -25,8 +26,7 @@ function readSettings() {
 function writeSettings(url, { window: win, basket, held }) {
   url.searchParams.set('window', win);
   url.searchParams.set('held', String(held));
-  if (basket) url.searchParams.set('basket', 'yes');
-  else url.searchParams.delete('basket');
+  url.searchParams.set('basket', basket ? 'yes' : 'no');
 }
 
 // ?view=a shows the existing homepage (Version A) with the same settings, for comparison.
