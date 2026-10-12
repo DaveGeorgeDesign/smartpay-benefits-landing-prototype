@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { WINDOWS, HELD } from '../data.js';
 
 function CogIcon() {
   return (
@@ -25,10 +24,9 @@ function Segmented({ label, options, value, onChange }) {
   );
 }
 
-// Cog button that opens the prototype settings. Not part of the design;
-// the choices are kept in the URL (?view, ?window, ?basket, ?held).
-// Benefit Pots aren't a live feature, so they have no setting here; ?pot=show still turns them on.
-export default function PrototypeControls({ settings, onChange, view, onView }) {
+// Cog button that switches between Version A and Version B. Not part of the design.
+// Each version shows one state; the other settings are only set by the URL (?window, ?basket, ?held, ?pot=show).
+export default function PrototypeControls({ view, onView }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -49,9 +47,6 @@ export default function PrototypeControls({ settings, onChange, view, onView }) 
       {open && (
         <div className="proto-panel" role="dialog" aria-label="Prototype settings">
           <Segmented label="Homepage version" options={[['current', 'Version A'], ['new', 'Version B']]} value={view} onChange={onView} />
-          <Segmented label="Election window" options={WINDOWS} value={settings.window} onChange={(w) => onChange({ window: w })} />
-          <Segmented label="Basket" options={[[true, 'Yes'], [false, 'No']]} value={settings.basket} onChange={(b) => onChange({ basket: b })} />
-          <Segmented label="Benefits held" options={HELD.map((n) => [n, String(n)])} value={settings.held} onChange={(n) => onChange({ held: n })} />
         </div>
       )}
       <button
