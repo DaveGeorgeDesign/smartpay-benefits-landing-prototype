@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BENEFITS, orderFor } from '../data.js';
 import BalancedGrid from './BalancedGrid.jsx';
-import { WINDOW_DATE as WINDOW_DATE_VALUE, EFFECTIVE_DATE, POT_RENEWAL_DAYS, POT_RENEWAL_DATE, ddmmyyyy, longDate } from '../dates.js';
+import { WINDOW_DAYS, WINDOW_DATE as WINDOW_DATE_VALUE, EFFECTIVE_DATE, POT_RENEWAL_DAYS, POT_RENEWAL_DATE, ddmmyyyy, longDate } from '../dates.js';
 import {
   CheckCircleIcon, BlockedIcon, RenewIcon, StarOutlineSmallIcon, EyeIcon, HomeIcon, ChevronForwardIcon,
   DetailsChevronIcon, FileDownloadIcon, BasketIllustration, CartIcon,
@@ -12,6 +12,9 @@ import {
 // shown with the same prototype settings as the new design so the two can be compared.
 
 const img = (name) => `${import.meta.env.BASE_URL}images/${name}`;
+
+// Days left in the window when it "closes soon"
+const CLOSING_DAYS = 3;
 
 // Benefits paid for through salary only, so never Benefit Pot eligible
 const NOT_POT_ELIGIBLE = ['payrollGiving', 'mortgage'];
@@ -89,12 +92,18 @@ function PotWidget({ pot, hidden }) {
   );
 }
 
-function ActiveBenefit({ order, hidden }) {
+function ActiveBenefit({ order, hidden, future }) {
   const [open, setOpen] = useState(false);
   const detailsId = `cur-${order.ref}`;
   return (
     <article className="cur-panel cur-active">
-      {order.status === 'closed' ? (
+      {future ? (
+        <div className="cur-chips">
+          <span className="cur-chip cur-chip-green"><CheckCircleIcon size={12} color="currentColor" />Active benefit</span>
+          <span className="cur-chip cur-chip-blue">Effective from {ddmmyyyy(EFFECTIVE_DATE)}</span>
+          <span className="cur-chip cur-chip-amber"><RenewIcon size={12} color="currentColor" />Auto-renew</span>
+        </div>
+      ) : order.status === 'closed' ? (
         <span className="cur-chip cur-chip-grey"><BlockedIcon size={12} color="currentColor" />Closed</span>
       ) : (
         <span className="cur-chip cur-chip-green"><CheckCircleIcon size={12} color="currentColor" />Active</span>
@@ -166,10 +175,11 @@ function BasketPanel({ items }) {
   );
 }
 
+// Small status label above the card title, as on the live Arsenal and Robert Walters sites
 function Status({ Icon, tone, children }) {
   return (
-    <span className={`cur-status cur-status-${tone}`}>
-      <Icon size={14} color="currentColor" />
+    <span className={`cur-chip cur-chip-${tone}`}>
+      <Icon size={12} color="currentColor" />
       {children}
     </span>
   );
@@ -191,14 +201,18 @@ function BenefitCard({ id, cfg, inBasket, showPot }) {
         )}
       </div>
       <div className="cur-card-content">
-        <h3 className="cur-card-title">{b.title}</h3>
-        <div className="cur-card-status">
-          {!windowBenefit && <Status Icon={CheckCircleIcon} tone="green">Always Open</Status>}
-          {windowBenefit && cfg.window === 'open' && <Status Icon={CheckCircleIcon} tone="green">Open until {WINDOW_DATE}</Status>}
-          {windowBenefit && cfg.window === 'closing' && <Status Icon={RenewIcon} tone="amber">Closes in 3 days</Status>}
-          {notOpen && <Status Icon={BlockedIcon} tone="red">Not Open</Status>}
-          {showPot && !notOpen && !NOT_POT_ELIGIBLE.includes(id) && <Status Icon={CheckCircleIcon} tone="green">Benefit Pot</Status>}
+        <div className="cur-card-head">
+          <div className="cur-card-status">
+            {!windowBenefit && <Status Icon={CheckCircleIcon} tone="green">Always Open</Status>}
+            {windowBenefit && !notOpen && <Status Icon={CheckCircleIcon} tone="green">Open</Status>}
+            {notOpen && <Status Icon={BlockedIcon} tone="red">Not Open</Status>}
+            {showPot && !notOpen && !NOT_POT_ELIGIBLE.includes(id) && <Status Icon={CheckCircleIcon} tone="green">Benefit Pot</Status>}
+          </div>
+          <h3 className="cur-card-title">{b.title}</h3>
         </div>
+        {windowBenefit && !notOpen && (
+          <p className="cur-card-note">The window closes in <strong>{cfg.window === 'closing' ? CLOSING_DAYS : WINDOW_DAYS} days</strong></p>
+        )}
         {notOpen && <p className="cur-card-note">The next window for this benefit opens on {WINDOW_DATE}.</p>}
         <div className="cur-actions">
           {!notOpen && (
@@ -211,15 +225,67 @@ function BenefitCard({ id, cfg, inBasket, showPot }) {
   );
 }
 
-function FaqBanner() {
+// FAQs and life events side by side, as on the live client sites
+function HelpRow() {
   return (
-    <section className="cur-panel cur-faq">
-      <img src={img('faq-icon.svg')} width="64" height="64" alt="" />
-      <div className="cur-faq-text">
-        <h2 className="cur-panel-title">Frequently Asked Questions</h2>
+    <div className="cur-help-row">
+      <section className="cur-panel cur-help cur-help-faq">
+        <h2 className="cur-help-title">Frequently Asked Questions</h2>
         <p>Want to know more? Take a look at our frequently asked questions.</p>
+        <div className="cur-actions">
+          <a href="#" className="cur-button cur-button-secondary">See FAQs</a>
+        </div>
+      </section>
+      <section className="cur-panel cur-help cur-help-life">
+        <h2 className="cur-help-title">Have your circumstances changed?</h2>
+        <p>You may be eligible to select or amend some benefits if a life event has occurred.</p>
+        <div className="cur-actions">
+          <a href="#" className="cur-button cur-button-secondary">Log a Life Event</a>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+// Explains the auto-renew and expiry labels, shown above the benefit tabs on the live sites
+function LabelKey() {
+  return (
+    <ul className="cur-key">
+      <li><RenewIcon size={14} color="#e07b00" />Auto-renew benefits will retain your current cover levels and personal details if you don’t amend them.</li>
+      <li><BlockedIcon size={14} color="#c4122f" />Benefits with this label will expire at the end of the current period unless you reapply for them.</li>
+    </ul>
+  );
+}
+
+// Active now / Future tabs. Held election-window benefits (PMI) move to Future while the window isn't open,
+// as they're already set for the next period from the effective date; everything else, basket included, is Active now.
+function BenefitTabs({ orders, basket, window, hidden }) {
+  const isFuture = (o) => window === 'closed' && Boolean(BENEFITS[o.key]?.electionWindow);
+  const now = orders.filter((o) => !isFuture(o));
+  const future = orders.filter(isFuture);
+  const nowCount = now.length + basket.length;
+  const [tab, setTab] = useState(nowCount || !future.length ? 'active' : 'future');
+  const tabs = [['active', `Active now (${nowCount})`], ['future', `Future (${future.length})`]];
+  const empty = tab === 'active' ? !nowCount : !future.length;
+  return (
+    <section className="cur-section cur-tabs-section">
+      <div className="cur-tabs" role="tablist">
+        {tabs.map(([id, label]) => (
+          <button type="button" key={id} role="tab" aria-selected={tab === id} className={tab === id ? 'is-active' : ''} onClick={() => setTab(id)}>
+            {label}
+          </button>
+        ))}
       </div>
-      <a href="#" className="cur-button cur-button-secondary cur-button-lg">See FAQs</a>
+      <div className="cur-active-list" role="tabpanel">
+        {tab === 'active' && basket.map((k) => <BasketBenefit key={k} id={k} hidden={hidden} />)}
+        {tab === 'active' && now.map((o) => <ActiveBenefit key={o.ref} order={o} hidden={hidden} />)}
+        {tab === 'future' && future.map((o) => <ActiveBenefit key={o.ref} order={o} hidden={hidden} future />)}
+        {empty && (
+          <p className="cur-tabs-empty">
+            {tab === 'active' ? 'You don’t have any active benefits yet.' : 'You don’t have any benefits starting in the future.'}
+          </p>
+        )}
+      </div>
     </section>
   );
 }
@@ -248,7 +314,7 @@ export default function CurrentHomepage({ page, showPot = true }) {
   const pot = showPot ? (page.held === 4 ? POT_FOUR : POT) : null;
   // Without pots, drop the pot rows (and Card value, which would then just repeat Total cost)
   const stripPot = (rows) => rows.filter(([k]) => showPot || !/Benefit Pot|Card value/.test(k));
-  const orders = (page.orders || []).map((k) => orderFor(k, page.window)).map((o) => ({ ...o, fields: stripPot(o.fields), summary: stripPot(o.summary) }));
+  const orders = (page.orders || []).map((k) => ({ key: k, ...orderFor(k, page.window) })).map((o) => ({ ...o, fields: stripPot(o.fields), summary: stripPot(o.summary) }));
   const basket = page.basket ? page.basket.items : [];
   // Same benefits as the new design's state, Cycle to Work and Household & Tech first, then catalogue order;
   // unlike the new design, the current site doesn't move closed window-only benefits to the end
@@ -265,15 +331,8 @@ export default function CurrentHomepage({ page, showPot = true }) {
           <Breadcrumbs privacy={privacy} onPrivacy={setPrivacy} />
           {pot && <PotWidget pot={pot} hidden={privacy} />}
 
-          {(orders.length > 0 || basket.length > 0) && (
-            <section className="cur-section">
-              <h2 className="cur-section-title">Active Benefits</h2>
-              <div className="cur-active-list">
-                {basket.map((k) => <BasketBenefit key={k} id={k} hidden={privacy} />)}
-                {orders.map((o) => <ActiveBenefit key={o.ref} order={o} hidden={privacy} />)}
-              </div>
-            </section>
-          )}
+          <LabelKey />
+          <BenefitTabs orders={orders} basket={basket} window={page.window} hidden={privacy} />
 
           {basket.length > 0 && <BasketPanel items={basket} />}
 
@@ -291,7 +350,7 @@ export default function CurrentHomepage({ page, showPot = true }) {
             </BalancedGrid>
           </section>
 
-          <FaqBanner />
+          <HelpRow />
         </div>
       </main>
     </div>
