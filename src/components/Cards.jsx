@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { BENEFITS } from '../data.js';
+import { WINDOW_DAYS } from '../dates.js';
 import {
   ArrowRightIcon, CheckCircleIcon, BlockedIcon, FlameIcon, StarOutlineSmallIcon, DetailsChevronIcon, FileDownloadIcon,
 } from './Icons.jsx';
@@ -7,7 +8,7 @@ import {
 const TAGS = {
   active: { className: 'tag-green', Icon: CheckCircleIcon, label: 'Active' },
   open: { className: 'tag-green', Icon: CheckCircleIcon },
-  closed: { className: 'tag-grey', Icon: BlockedIcon, label: 'Closed' },
+  closed: { className: 'tag-grey', Icon: BlockedIcon, label: `Reopens in ${WINDOW_DAYS}d` },
   popular: { className: 'tag-blue', Icon: FlameIcon, label: 'Popular' },
   new: { className: 'tag-blue', Icon: StarOutlineSmallIcon, label: 'New benefit' },
 };
