@@ -651,7 +651,7 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
 .cur-section-title { font-size: 28px; line-height: 34px; font-weight: 700; }
 .cur-section-intro { margin-top: 5px; font-size: 16px; line-height: 26px; }
 
-/* Active Benefits */
+/* Held and basket benefits */
 .cur-active-list { display: flex; flex-direction: column; gap: 16px; }
 .cur-active { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 20px 24px; }
 .cur-active-title { font-size: 20px; line-height: 28px; font-weight: 700; }
@@ -725,19 +725,28 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
 .cur-card-content { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; flex: 1; padding: 16px; }
 .cur-card-content .cur-actions { margin-top: auto; }
 .cur-card-title { font-size: 18px; line-height: 24px; font-weight: 700; }
-.cur-card-status { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.cur-card-head { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.cur-card-status { display: flex; flex-wrap: wrap; gap: 4px; }
+.cur-card-status:empty { display: none; }
 .cur-card-note { font-size: 14px; line-height: 22px; color: var(--text-secondary); }
 
-.cur-status { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; line-height: 24px; font-weight: 600; white-space: nowrap; }
-.cur-status-green { color: var(--green); }
-.cur-status-red { color: #c4122f; }
-.cur-status-amber { color: #a35a00; }
-.cur-status-blue { color: var(--blue-140); }
 
-/* FAQ banner */
-.cur-faq { display: flex; align-items: center; gap: 24px; padding: 24px 28px; margin-top: 0; }
-.cur-faq img { flex-shrink: 0; }
-.cur-faq-text { flex: 1; display: flex; flex-direction: column; gap: 8px; font-size: 16px; line-height: 26px; }
+/* FAQs and life events */
+.cur-help-row { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; }
+.cur-help { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 20px 24px; font-size: 14px; line-height: 22px; color: var(--text-secondary); }
+.cur-help-title { font-size: 18px; line-height: 24px; font-weight: 700; color: var(--text-primary); }
+.cur-help .cur-actions { margin-top: auto; }
+
+/* Label key and Active now / Future tabs */
+.cur-key { display: flex; flex-direction: column; gap: 4px; margin: -8px 0 0; padding: 0; list-style: none; font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+.cur-key li { display: flex; align-items: center; gap: 8px; }
+.cur-key svg { flex-shrink: 0; }
+.cur-tabs-section { gap: 16px; }
+.cur-tabs { display: grid; grid-template-columns: 1fr 1fr; background: #fff; border-radius: 4px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08); }
+.cur-tabs button { height: 48px; border-bottom: 3px solid transparent; font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.cur-tabs button.is-active { border-bottom-color: var(--green); }
+.cur-tabs button:not(.is-active) { background: #fafafa; }
+.cur-tabs-empty { padding: 4px 0; font-size: 14px; line-height: 22px; color: var(--text-secondary); }
 
 .current + .footer { margin-top: 24px; }
 
@@ -762,7 +771,7 @@ a.benefit-card:hover .text-link { text-decoration: underline; }
   .cur-card-media { height: auto; aspect-ratio: 302 / 180; }
   .cur-active-details dl { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; }
   .cur-basket { flex-direction: column-reverse; align-items: flex-start; }
-  .cur-faq { flex-direction: column; align-items: flex-start; }
+  .cur-help-row { grid-template-columns: 1fr; }
 }
 
 /* Segmented switches in the prototype settings panel */
