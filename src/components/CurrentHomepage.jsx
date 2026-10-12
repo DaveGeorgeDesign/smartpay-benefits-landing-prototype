@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BENEFITS, ORDERS } from '../data.js';
+import { BENEFITS, orderFor } from '../data.js';
 import BalancedGrid from './BalancedGrid.jsx';
 import { WINDOW_DATE as WINDOW_DATE_VALUE, EFFECTIVE_DATE, POT_RENEWAL_DAYS, POT_RENEWAL_DATE, ddmmyyyy, longDate } from '../dates.js';
 import {
@@ -248,7 +248,7 @@ export default function CurrentHomepage({ page, showPot = true }) {
   const pot = showPot ? (page.held === 4 ? POT_FOUR : POT) : null;
   // Without pots, drop the pot rows (and Card value, which would then just repeat Total cost)
   const stripPot = (rows) => rows.filter(([k]) => showPot || !/Benefit Pot|Card value/.test(k));
-  const orders = (page.orders || []).map((k) => ({ ...ORDERS[k], fields: stripPot(ORDERS[k].fields), summary: stripPot(ORDERS[k].summary) }));
+  const orders = (page.orders || []).map((k) => orderFor(k, page.window)).map((o) => ({ ...o, fields: stripPot(o.fields), summary: stripPot(o.summary) }));
   const basket = page.basket ? page.basket.items : [];
   // Same benefits as the new design's state, Cycle to Work and Household & Tech first, then catalogue order;
   // unlike the new design, the current site doesn't move closed window-only benefits to the end
