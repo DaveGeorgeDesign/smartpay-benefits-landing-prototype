@@ -75,14 +75,6 @@ export default function App() {
     window.history.replaceState({}, '', url);
   }, []);
 
-  const changeSettings = (change) => {
-    const next = { ...settings, ...change };
-    const url = new URL(window.location.href);
-    writeSettings(url, next);
-    window.history.pushState({}, '', url);
-    setSettings(next);
-  };
-
   const selectView = (v) => {
     const url = new URL(window.location.href);
     if (v === 'current') url.searchParams.set('view', 'a');
@@ -95,8 +87,6 @@ export default function App() {
   const controls = (
     <PrototypeControls
       key="prototype-controls"
-      settings={settings}
-      onChange={changeSettings}
       view={view}
       onView={selectView}
     />
