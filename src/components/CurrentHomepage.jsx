@@ -92,12 +92,18 @@ function PotWidget({ pot, hidden }) {
   );
 }
 
-function ActiveBenefit({ order, hidden }) {
+function ActiveBenefit({ order, hidden, future }) {
   const [open, setOpen] = useState(false);
   const detailsId = `cur-${order.ref}`;
   return (
     <article className="cur-panel cur-active">
-      {order.status === 'closed' ? (
+      {future ? (
+        <div className="cur-chips">
+          <span className="cur-chip cur-chip-green"><CheckCircleIcon size={12} color="currentColor" />Active benefit</span>
+          <span className="cur-chip cur-chip-blue">Effective from {ddmmyyyy(EFFECTIVE_DATE)}</span>
+          <span className="cur-chip cur-chip-amber"><RenewIcon size={12} color="currentColor" />Auto-renew</span>
+        </div>
+      ) : order.status === 'closed' ? (
         <span className="cur-chip cur-chip-grey"><BlockedIcon size={12} color="currentColor" />Closed</span>
       ) : (
         <span className="cur-chip cur-chip-green"><CheckCircleIcon size={12} color="currentColor" />Active</span>
@@ -251,11 +257,16 @@ function LabelKey() {
   );
 }
 
-// Active now / Future tabs. Held benefits are active now; basket items start in the future, on the effective date.
-function BenefitTabs({ orders, basket, hidden }) {
-  const [tab, setTab] = useState(orders.length || !basket.length ? 'active' : 'future');
-  const tabs = [['active', `Active now (${orders.length})`], ['future', `Future (${basket.length})`]];
-  const empty = tab === 'active' ? !orders.length : !basket.length;
+// Active now / Future tabs. Held election-window benefits (PMI) move to Future while the window isn't open,
+// as they're already set for the next period from the effective date; everything else, basket included, is Active now.
+function BenefitTabs({ orders, basket, window, hidden }) {
+  const isFuture = (o) => window === 'closed' && Boolean(BENEFITS[o.key]?.electionWindow);
+  const now = orders.filter((o) => !isFuture(o));
+  const future = orders.filter(isFuture);
+  const nowCount = now.length + basket.length;
+  const [tab, setTab] = useState(nowCount || !future.length ? 'active' : 'future');
+  const tabs = [['active', `Active now (${nowCount})`], ['future', `Future (${future.length})`]];
+  const empty = tab === 'active' ? !nowCount : !future.length;
   return (
     <section className="cur-section cur-tabs-section">
       <div className="cur-tabs" role="tablist">
@@ -266,8 +277,9 @@ function BenefitTabs({ orders, basket, hidden }) {
         ))}
       </div>
       <div className="cur-active-list" role="tabpanel">
-        {tab === 'future' && basket.map((k) => <BasketBenefit key={k} id={k} hidden={hidden} />)}
-        {tab === 'active' && orders.map((o) => <ActiveBenefit key={o.ref} order={o} hidden={hidden} />)}
+        {tab === 'active' && basket.map((k) => <BasketBenefit key={k} id={k} hidden={hidden} />)}
+        {tab === 'active' && now.map((o) => <ActiveBenefit key={o.ref} order={o} hidden={hidden} />)}
+        {tab === 'future' && future.map((o) => <ActiveBenefit key={o.ref} order={o} hidden={hidden} future />)}
         {empty && (
           <p className="cur-tabs-empty">
             {tab === 'active' ? 'You don’t have any active benefits yet.' : 'You don’t have any benefits starting in the future.'}
@@ -302,7 +314,7 @@ export default function CurrentHomepage({ page, showPot = true }) {
   const pot = showPot ? (page.held === 4 ? POT_FOUR : POT) : null;
   // Without pots, drop the pot rows (and Card value, which would then just repeat Total cost)
   const stripPot = (rows) => rows.filter(([k]) => showPot || !/Benefit Pot|Card value/.test(k));
-  const orders = (page.orders || []).map((k) => orderFor(k, page.window)).map((o) => ({ ...o, fields: stripPot(o.fields), summary: stripPot(o.summary) }));
+  const orders = (page.orders || []).map((k) => ({ key: k, ...orderFor(k, page.window) })).map((o) => ({ ...o, fields: stripPot(o.fields), summary: stripPot(o.summary) }));
   const basket = page.basket ? page.basket.items : [];
   // Same benefits as the new design's state, Cycle to Work and Household & Tech first, then catalogue order;
   // unlike the new design, the current site doesn't move closed window-only benefits to the end
@@ -320,7 +332,7 @@ export default function CurrentHomepage({ page, showPot = true }) {
           {pot && <PotWidget pot={pot} hidden={privacy} />}
 
           <LabelKey />
-          <BenefitTabs orders={orders} basket={basket} hidden={privacy} />
+          <BenefitTabs orders={orders} basket={basket} window={page.window} hidden={privacy} />
 
           {basket.length > 0 && <BasketPanel items={basket} />}
 
