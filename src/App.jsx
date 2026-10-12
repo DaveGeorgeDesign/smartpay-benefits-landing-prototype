@@ -91,14 +91,6 @@ export default function App() {
     setView(v);
   };
 
-  const selectShowPot = (on) => {
-    const url = new URL(window.location.href);
-    if (on) url.searchParams.set('pot', 'show');
-    else url.searchParams.delete('pot');
-    window.history.pushState({}, '', url);
-    setShowPot(on);
-  };
-
   // Keyed so the settings panel stays open when switching between the two views
   const controls = (
     <PrototypeControls
@@ -107,8 +99,6 @@ export default function App() {
       onChange={changeSettings}
       view={view}
       onView={selectView}
-      showPot={showPot}
-      onShowPot={selectShowPot}
     />
   );
 
