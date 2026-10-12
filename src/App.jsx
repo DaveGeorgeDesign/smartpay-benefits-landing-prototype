@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ORDERS, WINDOWS, HELD, LEGACY_STATES, buildPage } from './data.js';
+import { orderFor, WINDOWS, HELD, LEGACY_STATES, buildPage } from './data.js';
 import Header from './components/Header.jsx';
 import { BenefitCard, OrderCard, WideOrderCard, Kpi } from './components/Cards.jsx';
 import { Breadcrumbs, SensitiveToggle, BasketBanner, Faq, Footer } from './components/Sections.jsx';
@@ -113,7 +113,7 @@ export default function App() {
     );
   }
 
-  const orders = (page.orders || []).map((k) => (showPot ? ORDERS[k] : withoutPot(ORDERS[k])));
+  const orders = (page.orders || []).map((k) => (showPot ? orderFor(k, page.window) : withoutPot(orderFor(k, page.window))));
   const hasOrders = orders.length > 0;
   // New users only get the Benefit Pot module KPIs, so none show while pots are hidden
   const kpiList = showPot ? page.kpis : page.held ? page.kpis.filter((k) => k.key !== 'pot') : null;

@@ -173,6 +173,14 @@ export const ORDERS = {
   },
 };
 
+// Election-window benefits (PMI) can only be changed while the window is open or closing,
+// so their order shows Closed with "Make changes" disabled only when the window is closed.
+export function orderFor(key, window) {
+  const order = ORDERS[key];
+  if (order.status !== 'closed' || window === 'closed') return order;
+  return { ...order, status: 'active', action: { ...order.action, disabled: false } };
+}
+
 const NEW_USER_INTRO = 'Start saving on tax, National Insurance, fees and interest - choose your first benefit now!';
 const ENGAGED_INTRO = 'Your benefits are really paying off - but there’s so much more available!';
 
