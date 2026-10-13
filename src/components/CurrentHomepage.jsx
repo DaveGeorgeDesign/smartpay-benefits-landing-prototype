@@ -103,10 +103,16 @@ function ActiveBenefit({ order, hidden, future }) {
           <span className="cur-chip cur-chip-blue">Effective from {ddmmyyyy(EFFECTIVE_DATE)}</span>
           <span className="cur-chip cur-chip-amber"><RenewIcon size={12} color="currentColor" />Auto-renew</span>
         </div>
-      ) : order.status === 'closed' ? (
-        <span className="cur-chip cur-chip-grey"><BlockedIcon size={12} color="currentColor" />Closed</span>
       ) : (
-        <span className="cur-chip cur-chip-green"><CheckCircleIcon size={12} color="currentColor" />Active</span>
+        <div className="cur-chips">
+          {order.status === 'closed' ? (
+            <span className="cur-chip cur-chip-grey"><BlockedIcon size={12} color="currentColor" />Closed</span>
+          ) : (
+            <span className="cur-chip cur-chip-green"><CheckCircleIcon size={12} color="currentColor" />Active</span>
+          )}
+          {order.renewal === 'auto' && <span className="cur-chip cur-chip-amber"><RenewIcon size={12} color="currentColor" />Auto-renew</span>}
+          {order.renewal === 'expires' && <span className="cur-chip cur-chip-red"><BlockedIcon size={12} color="currentColor" />Ending on {order.endDate}</span>}
+        </div>
       )}
       <h3 className="cur-active-title">{order.title}</h3>
       <dl className="cur-active-fields">
@@ -193,10 +199,14 @@ function BenefitCard({ id, cfg, inBasket, showPot }) {
     <article className="cur-card">
       <div className="cur-card-media">
         <img src={b.image} alt="" loading="lazy" />
+        {/* One badge at most: In basket takes priority over New Benefit */}
         {(inBasket || b.tag === 'new') && (
           <div className="cur-card-badges">
-            {inBasket && <span className="tag tag-red"><CheckCircleIcon color="currentColor" />In basket</span>}
-            {b.tag === 'new' && <span className="tag tag-blue"><StarOutlineSmallIcon color="currentColor" />New Benefit</span>}
+            {inBasket ? (
+              <span className="tag tag-red"><CartIcon size={14} color="currentColor" />In basket</span>
+            ) : (
+              <span className="tag tag-blue"><StarOutlineSmallIcon color="currentColor" />New Benefit</span>
+            )}
           </div>
         )}
       </div>
@@ -225,25 +235,16 @@ function BenefitCard({ id, cfg, inBasket, showPot }) {
   );
 }
 
-// FAQs and life events side by side, as on the live client sites
-function HelpRow() {
+function FaqBanner() {
   return (
-    <div className="cur-help-row">
-      <section className="cur-panel cur-help cur-help-faq">
-        <h2 className="cur-help-title">Frequently Asked Questions</h2>
+    <section className="cur-panel cur-faq">
+      <img src={img('faq-icon.svg')} width="64" height="64" alt="" />
+      <div className="cur-faq-text">
+        <h2 className="cur-panel-title">Frequently Asked Questions</h2>
         <p>Want to know more? Take a look at our frequently asked questions.</p>
-        <div className="cur-actions">
-          <a href="#" className="cur-button cur-button-secondary">See FAQs</a>
-        </div>
-      </section>
-      <section className="cur-panel cur-help cur-help-life">
-        <h2 className="cur-help-title">Have your circumstances changed?</h2>
-        <p>You may be eligible to select or amend some benefits if a life event has occurred.</p>
-        <div className="cur-actions">
-          <a href="#" className="cur-button cur-button-secondary">Log a Life Event</a>
-        </div>
-      </section>
-    </div>
+      </div>
+      <a href="#" className="cur-button cur-button-secondary cur-button-lg">See FAQs</a>
+    </section>
   );
 }
 
@@ -350,7 +351,7 @@ export default function CurrentHomepage({ page, showPot = true }) {
             </BalancedGrid>
           </section>
 
-          <HelpRow />
+          <FaqBanner />
         </div>
       </main>
     </div>
