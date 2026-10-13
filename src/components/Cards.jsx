@@ -3,6 +3,7 @@ import { BENEFITS } from '../data.js';
 import { WINDOW_DAYS } from '../dates.js';
 import {
   ArrowRightIcon, CheckCircleIcon, BlockedIcon, FlameIcon, StarOutlineSmallIcon, DetailsChevronIcon, FileDownloadIcon,
+  CartIcon, RenewIcon,
 } from './Icons.jsx';
 
 const TAGS = {
@@ -11,13 +12,23 @@ const TAGS = {
   closed: { className: 'tag-grey', Icon: BlockedIcon, label: `Reopens in ${WINDOW_DAYS}d` },
   popular: { className: 'tag-blue', Icon: FlameIcon, label: 'Popular' },
   new: { className: 'tag-blue', Icon: StarOutlineSmallIcon, label: 'New benefit' },
+  basket: { className: 'tag-red', Icon: CartIcon, label: 'In basket' },
+  auto: { className: 'tag-amber', Icon: RenewIcon, label: 'Auto-renews' },
+  expires: { className: 'tag-red', Icon: BlockedIcon },
 };
+
+// Held insurance either renews by itself or lapses at the end of the period
+function RenewalTag({ order }) {
+  if (order.renewal === 'auto') return <Tag kind="auto" />;
+  if (order.renewal === 'expires') return <Tag kind="expires" label={`Expires ${order.endDate}`} />;
+  return null;
+}
 
 export function Tag({ kind, label }) {
   const t = TAGS[kind];
   return (
     <span className={`tag ${t.className}`}>
-      <t.Icon />
+      <t.Icon color="currentColor" />
       {label || t.label}
     </span>
   );
@@ -27,17 +38,18 @@ function RichText({ parts }) {
   return parts.map((p, i) => (typeof p === 'string' ? <span key={i}>{p}</span> : <strong key={i}>{p.b}</strong>));
 }
 
-// "Benefits you are eligible for" card (image, title, saving, CTA)
-export function BenefitCard({ id, tag, closed = false }) {
+// "Benefits you are eligible for" card (image, title, saving, CTA).
+// The image carries one badge at most; In basket takes priority over New, Popular and Open.
+export function BenefitCard({ id, tag, closed = false, inBasket = false }) {
   const b = BENEFITS[id];
-  const tagKind = closed ? 'closed' : tag?.kind || b.tag;
+  const tagKind = closed ? 'closed' : inBasket ? 'basket' : tag?.kind || b.tag;
   const description = closed && b.closedDescription ? b.closedDescription : b.description;
   const Wrapper = closed ? 'div' : 'a';
   return (
     <Wrapper className={`benefit-card${closed ? ' is-closed' : ''}`} {...(closed ? { 'aria-disabled': true } : { href: '#' })}>
       <div className="benefit-card-image">
         <img src={b.image} alt="" loading="lazy" />
-        {tagKind && <Tag kind={tagKind} label={tag?.label} />}
+        {tagKind && <Tag kind={tagKind} label={tagKind === tag?.kind ? tag.label : undefined} />}
       </div>
       <div className="benefit-card-content">
         <h3 className="benefit-card-title">{b.title}</h3>
@@ -70,6 +82,7 @@ export function OrderCard({ order, hideSensitive }) {
         <div className="order-meta">
           <span className="order-ref">{order.ref}</span>
           <Tag kind={order.status} />
+          <RenewalTag order={order} />
         </div>
         <p className="order-date">{order.date}</p>
       </div>
@@ -128,6 +141,7 @@ export function WideOrderCard({ order, hideSensitive }) {
           <h3 className="order-title">{order.title}</h3>
           <span className="order-ref">{order.ref}</span>
           <Tag kind={order.status} />
+          <RenewalTag order={order} />
         </div>
         <p className="order-date">{order.date}</p>
       </div>

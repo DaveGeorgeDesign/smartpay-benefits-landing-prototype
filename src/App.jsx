@@ -83,7 +83,7 @@ export default function App() {
     setView(v);
   };
 
-  // Keyed so the settings panel stays open when switching between the two views
+  // Keyed so the toggle keeps its place when switching between the two views
   const controls = (
     <PrototypeControls
       key="prototype-controls"
@@ -149,7 +149,9 @@ export default function App() {
               {hasOrders ? 'Add more benefits' : 'Available to you now'} ({page.available.length})
             </h2>
             <BalancedGrid className="card-grid" count={page.available.length}>
-              {page.available.map((c) => <BenefitCard key={c.key} id={c.key} tag={c.tag} />)}
+              {page.available.map((c) => (
+                <BenefitCard key={c.key} id={c.key} tag={c.tag} inBasket={Boolean(page.basket?.items.includes(c.key))} />
+              ))}
             </BalancedGrid>
           </section>
 
@@ -172,7 +174,7 @@ export default function App() {
           </p>
         </div>
       </main>
-      <Faq />
+      <Faq window={page.window} />
       <Footer />
       {controls}
     </>

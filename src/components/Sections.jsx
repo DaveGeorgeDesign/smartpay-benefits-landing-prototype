@@ -50,7 +50,7 @@ export function BasketBanner({ items }) {
   );
 }
 
-export function Faq() {
+export function Faq({ window }) {
   const [open, setOpen] = useState(0);
   return (
     <section className="faq" aria-labelledby="faq-title">
@@ -70,7 +70,7 @@ export function Faq() {
                   <span>{item.q}</span>
                   <ChevronDownIcon className="accordion-chevron" />
                 </button>
-                {isOpen && <p className="accordion-body">{item.a}</p>}
+                {isOpen && <p className="accordion-body">{(typeof item.a === 'function' ? item.a(window) : item.a)}</p>}
               </div>
             );
           })}

@@ -140,6 +140,7 @@ export const ORDERS = {
     title: 'Private Medical Insurance',
     ref: 'PMI-2026-04620',
     status: 'closed',
+    renewal: 'auto',
     date: 'Policy renews 01 Aug 2027',
     fields: [
       ['Total cost', '£240.00'],
@@ -159,7 +160,10 @@ export const ORDERS = {
     title: 'Personal Accident Insurance',
     ref: 'PAI-2026-00915',
     status: 'active',
-    date: 'Policy renews 01 Aug 2027',
+    // Doesn't auto-renew: it lapses at the end of the period unless the employee reapplies
+    renewal: 'expires',
+    endDate: '31/07/2027',
+    date: 'Policy ends 31 Jul 2027',
     fields: [['Benefit amount', '£50,000']],
     action: { label: 'Benefit page' },
     summary: [
@@ -167,7 +171,7 @@ export const ORDERS = {
       ['Benefit amount', '£50,000'],
       ['Monthly premium', '£8.50'],
       ['Policy start', '01 Aug 2026'],
-      ['Renewal', '31 Jul 2027'],
+      ['Policy end', '31 Jul 2027'],
     ],
     documents: ['Policy schedule (PDF)', 'Key facts document (PDF)'],
   },
@@ -254,7 +258,12 @@ export const LEGACY_STATES = {
 export const FAQS = [
   {
     q: 'What is the Election window and when does it close?',
-    a: `The Election window is the period when you can apply for or change certain benefits, such as Holiday Trading and Payroll Giving. It is open now and closes at 23:59 on ${dayMonth(WINDOW_DATE)}. Outside this window these benefits stay locked until the next one opens.`,
+    // Follows the window setting, so it never says the window is open while it's closed
+    a: (window) => `The Election window is the period when you can apply for or change certain benefits, such as Holiday Trading and Payroll Giving. ${
+      window === 'closed'
+        ? `It is closed at the moment and the next one opens on ${dayMonth(WINDOW_DATE)}. Until then these benefits stay locked.`
+        : `It is open now and closes at 23:59 on ${dayMonth(WINDOW_DATE)}. Outside this window these benefits stay locked until the next one opens.`
+    }`,
   },
   // Answers 2–7 are placeholders pending real copy (per the Figma component notes)
   { q: 'How does salary sacrifice save me money?', a: 'Answer copy to follow.' },
